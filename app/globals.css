@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: theme("colors.bg.DEFAULT");
+  color: theme("colors.ink.DEFAULT");
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Hide spinners on numeric inputs — we use our own +/- controls. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Custom scrollbar — only on web; mobile uses native overflow. */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: theme("colors.line.strong");
+    border-radius: 999px;
+    border: 2px solid theme("colors.bg.DEFAULT");
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme("colors.ink.dim");
+  }
+}
+
+/* Page container — mobile-first centered column that maxes at 28rem. */
+.app-container {
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  /* leave room for the bottom nav + safe area */
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
