@@ -10,7 +10,6 @@ import { selectFoodForDay, useStore } from "@/lib/store";
 import { todayKey } from "@/lib/date";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { AiEstimator } from "./AiEstimator";
 
 export function NutritionScreen() {
   const food = useStore((s) => s.food);
@@ -134,14 +133,8 @@ export function NutritionScreen() {
 
       <Modal open={open} onClose={() => setOpen(false)} title="Log food">
         <div className="space-y-3">
-          <AiEstimator
-            onEstimate={(e) => {
-              setName(e.name);
-              setCal(String(e.calories));
-              setPro(String(e.protein));
-            }}
-          />
           <Input
+            autoFocus
             label="Name"
             placeholder="e.g. Chicken & rice"
             value={name}
