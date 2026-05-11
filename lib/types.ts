@@ -58,3 +58,19 @@ export interface FoodEntry {
   calories: number;
   protein: number;            // grams
 }
+
+/**
+ * Quality is a 4-point ordinal scale:
+ *   1 = Poor, 2 = Fair, 3 = Good, 4 = Great.
+ * Kept simple so users pick fast and so we can colour-bucket the chart
+ * without arguing about gradients.
+ */
+export type SleepQuality = 1 | 2 | 3 | 4;
+
+export interface SleepEntry {
+  id: ID;
+  date: DateKey;              // the date the user woke up
+  hours: number;              // total sleep duration in hours (decimal ok, e.g. 7.5)
+  quality: SleepQuality;
+  note?: string;
+}

@@ -11,6 +11,7 @@ import type {
   ExerciseSet,
   FoodEntry,
   Settings,
+  SleepEntry,
   Workout,
 } from "./types";
 import { addDays, differenceInCalendarDays, parseISO } from "date-fns";
@@ -31,6 +32,7 @@ interface State {
   workouts: Workout[];
   metrics: BodyMetric[];
   food: FoodEntry[];
+  sleep: SleepEntry[];
 
   // --- settings ----------------------------------------------------------
   updateSettings: (patch: Partial<Settings>) => void;
@@ -64,6 +66,11 @@ interface State {
   // --- food --------------------------------------------------------------
   logFood: (f: Omit<FoodEntry, "id">) => void;
   removeFood: (id: string) => void;
+
+  // --- sleep -------------------------------------------------------------
+  // Upserts: one entry per date — re-logging the same date replaces it.
+  logSleep: (s: Omit<SleepEntry, "id">) => void;
+  removeSleep: (id: string) => void;
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -81,6 +88,7 @@ export const useStore = create<State>()(
       workouts: [],
       metrics: [],
       food: [],
+      sleep: [],
 
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -240,6 +248,16 @@ export const useStore = create<State>()(
         set((s) => ({ food: [{ id: uid(), ...f }, ...s.food] })),
       removeFood: (id) =>
         set((s) => ({ food: s.food.filter((f) => f.id !== id) })),
+
+      logSleep: (entry) =>
+        set((s) => {
+          // Upsert by date — at most one sleep entry per day. If the user
+          // re-logs the same morning we treat it as a correction.
+          const filtered = s.sleep.filter((x) => x.date !== entry.date);
+          return { sleep: [{ id: uid(), ...entry }, ...filtered] };
+        }),
+      removeSleep: (id) =>
+        set((s) => ({ sleep: s.sleep.filter((x) => x.id !== id) })),
     }),
     {
       name: "pulse:v1",
@@ -561,4 +579,62 @@ export function trendDelta(
   const nonzero = points.filter((p) => p.value > 0);
   if (nonzero.length < 2) return null;
   return +(nonzero[nonzero.length - 1].value - nonzero[0].value).toFixed(1);
+}
+
+// ---------------------------------------------------------------------------
+// Sleep selectors
+// ---------------------------------------------------------------------------
+
+export interface SleepTrendPoint {
+  date: DateKey;
+  hours: number;        // 0 for nights with no log
+  quality: number;      // 0 for nights with no log
+}
+
+/**
+ * Per-day sleep series for the past `days` days, zero-filled for nights
+ * the user didn't log. Oldest-first so charts render left → right.
+ */
+export function selectSleepTrend(
+  sleep: SleepEntry[],
+  days: number,
+): SleepTrendPoint[] {
+  const today = new Date();
+  const byDate = new Map<DateKey, SleepTrendPoint>();
+  for (let i = days - 1; i >= 0; i--) {
+    const k = toKey(addDays(today, -i));
+    byDate.set(k, { date: k, hours: 0, quality: 0 });
+  }
+  for (const s of sleep) {
+    const slot = byDate.get(s.date);
+    if (!slot) continue;
+    slot.hours = s.hours;
+    slot.quality = s.quality;
+  }
+  return Array.from(byDate.values());
+}
+
+export interface SleepAverages {
+  nightsLogged: number;
+  avgHours: number;        // average across logged nights
+  avgQuality: number;      // 1..4
+}
+
+export function selectSleepAverages(trend: SleepTrendPoint[]): SleepAverages {
+  const logged = trend.filter((p) => p.hours > 0);
+  if (logged.length === 0) {
+    return { nightsLogged: 0, avgHours: 0, avgQuality: 0 };
+  }
+  const sumHours = logged.reduce((a, b) => a + b.hours, 0);
+  const sumQ = logged.reduce((a, b) => a + b.quality, 0);
+  return {
+    nightsLogged: logged.length,
+    avgHours: +(sumHours / logged.length).toFixed(1),
+    avgQuality: +(sumQ / logged.length).toFixed(1),
+  };
+}
+
+export function selectLatestSleep(sleep: SleepEntry[]): SleepEntry | undefined {
+  if (sleep.length === 0) return undefined;
+  return [...sleep].sort((a, b) => (a.date < b.date ? 1 : -1))[0];
 }

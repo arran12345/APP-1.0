@@ -68,7 +68,12 @@ export function NumberStepper({
       >
         <Minus size={14} strokeWidth={2.5} />
       </button>
-      <div className="flex-1 min-w-0 h-full flex items-center justify-center gap-1 px-1">
+      <div className="flex-1 min-w-0 h-full flex items-center justify-center gap-2 px-1">
+        {/*
+          Fixed-width input lets the number+unit group sit visually centred
+          with explicit space between them. Previously a w-full input
+          combined with text-right pushed the digit flush against the suffix.
+        */}
         <input
           inputMode="decimal"
           aria-label={ariaLabel}
@@ -77,7 +82,7 @@ export function NumberStepper({
             const n = Number(e.target.value.replace(",", "."));
             onChange(Number.isFinite(n) ? clamp(n) : min);
           }}
-          className="min-w-0 w-full bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
+          className="w-14 min-w-0 bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
         />
         {suffix && (
           <span className="text-2xs text-ink-dim shrink-0 leading-none">
