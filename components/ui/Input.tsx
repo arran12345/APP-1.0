@@ -58,6 +58,12 @@ export function NumberStepper({
   ariaLabel?: string;
 }) {
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
+  // Auto-size the input to fit its current value. Using `ch` with tabular-nums
+  // means 1ch ≈ width of one digit, so the input is exactly as wide as the
+  // number it shows — no trailing dead space, and the unit ("kg") sits right
+  // next to the digit with a deliberate 6px gap.
+  const display = String(Number.isFinite(value) ? value : 0);
+  const inputWidth = `${Math.max(1, display.length) + 0.25}ch`;
   return (
     <div className="inline-flex w-full items-center bg-bg-elev border border-line rounded-md h-9 overflow-hidden">
       <button
@@ -68,21 +74,17 @@ export function NumberStepper({
       >
         <Minus size={14} strokeWidth={2.5} />
       </button>
-      <div className="flex-1 min-w-0 h-full flex items-center justify-center gap-2 px-1">
-        {/*
-          Fixed-width input lets the number+unit group sit visually centred
-          with explicit space between them. Previously a w-full input
-          combined with text-right pushed the digit flush against the suffix.
-        */}
+      <div className="flex-1 min-w-0 h-full flex items-center justify-center gap-1.5 px-1">
         <input
           inputMode="decimal"
           aria-label={ariaLabel}
-          value={Number.isFinite(value) ? value : 0}
+          value={display}
           onChange={(e) => {
             const n = Number(e.target.value.replace(",", "."));
             onChange(Number.isFinite(n) ? clamp(n) : min);
           }}
-          className="w-14 min-w-0 bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
+          style={{ width: inputWidth }}
+          className="min-w-0 max-w-full bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
         />
         {suffix && (
           <span className="text-2xs text-ink-dim shrink-0 leading-none">
