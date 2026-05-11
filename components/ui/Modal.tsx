@@ -48,21 +48,19 @@ export function Modal({
           className,
         )}
       >
-        {(title || onClose) && (
-          <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
-            <h3 className="text-sm font-medium text-ink tracking-tight">
-              {title}
-            </h3>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close"
-              className="h-8 w-8 -mr-1 rounded-full text-ink-muted hover:text-ink hover:bg-bg-hover flex items-center justify-center transition-colors"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+          <h3 className="text-sm font-medium text-ink tracking-tight">
+            {title}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="h-8 w-8 -mr-1 rounded-full text-ink-muted hover:text-ink hover:bg-bg-hover flex items-center justify-center transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
         <div className="px-4 pb-4 overflow-y-auto">{children}</div>
       </div>
     </div>
