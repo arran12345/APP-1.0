@@ -51,12 +51,12 @@ export function MetricChart({
         >
           <defs>
             <linearGradient id="weightFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#A3E635" stopOpacity={0.35} />
-              <stop offset="100%" stopColor="#A3E635" stopOpacity={0} />
+              <stop offset="0%" stopColor="#5B9BD5" stopOpacity={0.32} />
+              <stop offset="100%" stopColor="#5B9BD5" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid
-            stroke="#1F1F23"
+            stroke="#E5DCC4"
             strokeDasharray="2 4"
             vertical={false}
           />
@@ -65,25 +65,26 @@ export function MetricChart({
             tickFormatter={(d) => format(parseISO(d), "MMM d")}
             tickLine={false}
             axisLine={false}
-            tick={{ fill: "#5A5A63", fontSize: 10 }}
+            tick={{ fill: "#94A4B7", fontSize: 10 }}
             minTickGap={28}
           />
           <YAxis
             domain={[Math.floor(min - pad), Math.ceil(max + pad)]}
             tickLine={false}
             axisLine={false}
-            tick={{ fill: "#5A5A63", fontSize: 10 }}
+            tick={{ fill: "#94A4B7", fontSize: 10 }}
             width={28}
           />
           <Tooltip
-            cursor={{ stroke: "#2A2A30", strokeWidth: 1 }}
+            cursor={{ stroke: "#C9BE9F", strokeWidth: 1 }}
             contentStyle={{
-              background: "#141416",
-              border: "1px solid #2A2A30",
+              background: "#FFFFFF",
+              border: "1px solid #E5DCC4",
               borderRadius: 8,
               fontSize: 12,
-              color: "#F5F5F7",
+              color: "#1E293B",
               padding: "6px 10px",
+              boxShadow: "0 1px 2px 0 rgba(30,41,59,0.06)",
             }}
             labelFormatter={(d) => format(parseISO(d as string), "EEE, MMM d")}
             formatter={(value: number, name) => {
@@ -95,12 +96,12 @@ export function MetricChart({
           <Area
             type="monotone"
             dataKey="weight"
-            stroke="#A3E635"
+            stroke="#5B9BD5"
             strokeWidth={2}
             fill="url(#weightFill)"
             connectNulls
-            dot={{ r: 2.5, fill: "#A3E635", stroke: "none" }}
-            activeDot={{ r: 4, fill: "#A3E635", stroke: "#0A0A0B", strokeWidth: 2 }}
+            dot={{ r: 2.5, fill: "#5B9BD5", stroke: "none" }}
+            activeDot={{ r: 4, fill: "#5B9BD5", stroke: "#FFFFFF", strokeWidth: 2 }}
             isAnimationActive={false}
           />
         </AreaChart>

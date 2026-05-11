@@ -6,31 +6,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Engineering-inspired neutral palette + a single accent.
-        // Surfaces use subtle steps so cards read clearly on dark mode.
+        // Cream-and-light-blue palette. Warm off-white surfaces with white
+        // cards layered on top, soft beige borders, and a muted sky accent.
         bg: {
-          DEFAULT: "#0A0A0B",
-          elev: "#111113",
-          card: "#141416",
-          hover: "#1A1A1D",
+          DEFAULT: "#F5F0E1",      // cream
+          elev: "#FFFFFF",         // raised surface (inputs, etc.)
+          card: "#FFFFFF",         // card body
+          hover: "#EDE7D3",        // hover surface on cream bg
         },
         line: {
-          DEFAULT: "#1F1F23",
-          strong: "#2A2A30",
+          DEFAULT: "#E5DCC4",      // warm beige border
+          strong: "#C9BE9F",       // emphasized border / focus ring base
         },
         ink: {
-          DEFAULT: "#F5F5F7",
-          muted: "#8A8A93",
-          dim: "#5A5A63",
+          DEFAULT: "#1E293B",      // slate-800, near-black text
+          muted: "#5D7185",        // secondary text
+          dim: "#94A4B7",          // tertiary text / placeholders
         },
         accent: {
-          DEFAULT: "#A3E635",      // lime — high-energy, distinctive
-          soft: "#3A4A1F",
-          ink: "#0A0A0B",
+          DEFAULT: "#5B9BD5",      // light blue — soft, distinctive
+          soft: "#E1EFF8",         // accent-tinted background
+          ink: "#FFFFFF",          // text on accent button
         },
-        danger: "#F87171",
-        warn: "#FBBF24",
-        ok: "#4ADE80",
+        danger: "#DC2626",
+        warn: "#D97706",
+        ok: "#16A34A",
       },
       fontFamily: {
         sans: [
@@ -61,7 +61,7 @@ const config: Config = {
         xl: "1.125rem",
       },
       boxShadow: {
-        card: "0 0 0 1px rgba(255,255,255,0.04), 0 1px 0 0 rgba(255,255,255,0.02) inset",
+        card: "0 1px 2px 0 rgba(30, 41, 59, 0.04), 0 0 0 1px rgba(30, 41, 59, 0.03)",
       },
       keyframes: {
         "fade-in": {
