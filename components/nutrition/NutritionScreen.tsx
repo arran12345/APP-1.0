@@ -10,6 +10,8 @@ import { selectFoodForDay, useStore } from "@/lib/store";
 import { todayKey } from "@/lib/date";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { DateNav } from "./DateNav";
+import { FoodSearch } from "./FoodSearch";
 
 export function NutritionScreen() {
   const food = useStore((s) => s.food);
@@ -18,7 +20,11 @@ export function NutritionScreen() {
   const settings = useStore((s) => s.settings);
   const updateSettings = useStore((s) => s.updateSettings);
 
-  const day = selectFoodForDay(food, todayKey());
+  // Selected day defaults to today. All reads/writes target this date so the
+  // user can navigate to any past day and add/remove entries retroactively.
+  const [selectedDate, setSelectedDate] = useState(todayKey());
+  const day = selectFoodForDay(food, selectedDate);
+  const isToday = selectedDate === todayKey();
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -34,7 +40,7 @@ export function NutritionScreen() {
     const p = Number(pro) || 0;
     if (!name.trim() && c === 0 && p === 0) return;
     logFood({
-      date: todayKey(),
+      date: selectedDate,
       name: name.trim() || "Food",
       calories: c,
       protein: p,
@@ -54,10 +60,12 @@ export function NutritionScreen() {
 
   return (
     <>
+      <DateNav date={selectedDate} onChange={setSelectedDate} />
+
       <Card className="p-4">
         <div className="flex items-baseline justify-between">
           <p className="text-2xs uppercase tracking-widest text-ink-dim">
-            Today
+            {isToday ? "Today" : "That day"}
           </p>
           <button
             onClick={() => {
@@ -95,15 +103,20 @@ export function NutritionScreen() {
         className="w-full"
         onClick={() => setOpen(true)}
       >
-        <Plus size={16} strokeWidth={2.5} /> Log food
+        <Plus size={16} strokeWidth={2.5} />
+        {isToday ? "Log food" : "Log food for that day"}
       </Button>
 
-      <SectionLabel>Today's log</SectionLabel>
+      <SectionLabel>{isToday ? "Today's log" : "That day's log"}</SectionLabel>
 
       {day.items.length === 0 ? (
         <Empty
-          title="Nothing logged today"
-          hint="Add a quick entry — name, calories, protein. That's it."
+          title="Nothing logged"
+          hint={
+            isToday
+              ? "Search the food database or type the numbers yourself."
+              : "Add what you ate — name, calories, protein."
+          }
         />
       ) : (
         <Card className="divide-y divide-line overflow-hidden">
@@ -133,8 +146,22 @@ export function NutritionScreen() {
 
       <Modal open={open} onClose={() => setOpen(false)} title="Log food">
         <div className="space-y-3">
+          {/* Search-and-tap: pick from the local database to fill the form */}
+          <FoodSearch
+            onPick={(f) => {
+              setName(`${f.name} (${f.serving})`);
+              setCal(String(f.kcal));
+              setPro(String(f.protein));
+            }}
+          />
+
+          <div className="flex items-center gap-3 text-2xs uppercase tracking-widest text-ink-dim">
+            <span className="flex-1 h-px bg-line" />
+            or enter manually
+            <span className="flex-1 h-px bg-line" />
+          </div>
+
           <Input
-            autoFocus
             label="Name"
             placeholder="e.g. Chicken & rice"
             value={name}
