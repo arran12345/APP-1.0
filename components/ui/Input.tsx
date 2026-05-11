@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Minus, Plus } from "lucide-react";
 import { type InputHTMLAttributes, forwardRef } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -58,16 +59,16 @@ export function NumberStepper({
 }) {
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
   return (
-    <div className="inline-flex w-full items-stretch bg-bg-elev border border-line rounded-md h-9 overflow-hidden">
+    <div className="inline-flex w-full items-center bg-bg-elev border border-line rounded-md h-9 overflow-hidden">
       <button
         type="button"
         aria-label={`Decrease ${ariaLabel ?? ""}`.trim()}
         onClick={() => onChange(clamp(value - step))}
-        className="w-8 shrink-0 text-ink-muted hover:text-ink hover:bg-bg-hover transition-colors leading-none"
+        className="h-full w-8 shrink-0 flex items-center justify-center text-ink-muted hover:text-ink hover:bg-bg-hover transition-colors"
       >
-        −
+        <Minus size={14} strokeWidth={2.5} />
       </button>
-      <div className="flex-1 min-w-0 flex items-baseline justify-center gap-0.5 px-1">
+      <div className="flex-1 min-w-0 h-full flex items-center justify-center gap-1 px-1">
         <input
           inputMode="decimal"
           aria-label={ariaLabel}
@@ -76,10 +77,10 @@ export function NumberStepper({
             const n = Number(e.target.value.replace(",", "."));
             onChange(Number.isFinite(n) ? clamp(n) : min);
           }}
-          className="min-w-0 w-full bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0"
+          className="min-w-0 w-full bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
         />
         {suffix && (
-          <span className="text-2xs text-ink-dim shrink-0 leading-none translate-y-px">
+          <span className="text-2xs text-ink-dim shrink-0 leading-none">
             {suffix}
           </span>
         )}
@@ -88,9 +89,9 @@ export function NumberStepper({
         type="button"
         aria-label={`Increase ${ariaLabel ?? ""}`.trim()}
         onClick={() => onChange(clamp(value + step))}
-        className="w-8 shrink-0 text-ink-muted hover:text-ink hover:bg-bg-hover transition-colors leading-none"
+        className="h-full w-8 shrink-0 flex items-center justify-center text-ink-muted hover:text-ink hover:bg-bg-hover transition-colors"
       >
-        +
+        <Plus size={14} strokeWidth={2.5} />
       </button>
     </div>
   );
