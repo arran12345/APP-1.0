@@ -1,6 +1,11 @@
 import { cn } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
-import { type InputHTMLAttributes, forwardRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useState,
+  type InputHTMLAttributes,
+} from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -58,12 +63,51 @@ export function NumberStepper({
   ariaLabel?: string;
 }) {
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
-  // Auto-size the input to fit its current value. Using `ch` with tabular-nums
-  // means 1ch ≈ width of one digit, so the input is exactly as wide as the
-  // number it shows — no trailing dead space, and the unit ("kg") sits right
-  // next to the digit with a deliberate 6px gap.
-  const display = String(Number.isFinite(value) ? value : 0);
-  const inputWidth = `${Math.max(1, display.length) + 0.25}ch`;
+
+  // Draft state — keep what the user is typing as a string so intermediate
+  // forms like "7." don't get parsed-and-stripped back to 7 mid-keystroke.
+  // We commit a parsed number on every valid edit and re-sync the draft when
+  // `value` changes from outside (e.g. when the user taps + / −).
+  const valueStr = String(Number.isFinite(value) ? value : 0);
+  const [draft, setDraft] = useState(valueStr);
+  useEffect(() => {
+    setDraft(valueStr);
+  }, [valueStr]);
+
+  // ch-based width with a generous buffer. tabular-nums + monospace make `ch`
+  // ≈ one digit width, but rendering on Android can shave a sub-pixel off the
+  // right edge — the previous +0.25ch buffer was clipping the last digit on
+  // some devices, so we use +0.9ch and a 2ch minimum.
+  const inputWidth = `${Math.max(2, draft.length) + 0.9}ch`;
+
+  function handleChange(raw: string) {
+    // Accept digits, an optional decimal separator, and partial states like
+    // "" / "." / "7." while typing. Anything else is ignored.
+    if (!/^\d*[.,]?\d*$/.test(raw)) return;
+    setDraft(raw);
+    if (raw === "" || raw === "." || raw === ",") return;
+    const n = Number(raw.replace(",", "."));
+    if (Number.isFinite(n)) onChange(clamp(n));
+  }
+
+  function handleBlur() {
+    // Empty / lone-decimal field on blur reverts to the last good value.
+    if (draft === "" || draft === "." || draft === ",") {
+      setDraft(valueStr);
+      return;
+    }
+    const n = Number(draft.replace(",", "."));
+    if (!Number.isFinite(n)) {
+      setDraft(valueStr);
+      return;
+    }
+    const clamped = clamp(n);
+    if (clamped !== n) {
+      onChange(clamped);
+      setDraft(String(clamped));
+    }
+  }
+
   return (
     <div className="inline-flex w-full items-center bg-bg-elev border border-line rounded-md h-9 overflow-hidden">
       <button
@@ -78,11 +122,9 @@ export function NumberStepper({
         <input
           inputMode="decimal"
           aria-label={ariaLabel}
-          value={display}
-          onChange={(e) => {
-            const n = Number(e.target.value.replace(",", "."));
-            onChange(Number.isFinite(n) ? clamp(n) : min);
-          }}
+          value={draft}
+          onChange={(e) => handleChange(e.target.value)}
+          onBlur={handleBlur}
           style={{ width: inputWidth }}
           className="min-w-0 max-w-full bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
         />
