@@ -31,6 +31,30 @@ npm run build && npm start
 npm run typecheck
 ```
 
+### Optional: AI meal estimation
+
+The food log has an **AI estimate** field that turns a plain-text meal
+description into kcal + protein and auto-fills the form. It calls Claude
+server-side via `/api/estimate-food` using structured outputs (so the
+response is always valid JSON).
+
+Without an API key the route returns 503 and the rest of the app works
+unchanged — manual entry is unaffected.
+
+To enable AI estimation:
+
+1. Get an API key from <https://console.anthropic.com>
+2. Add it to your deployment:
+   - **Vercel:** Project → Settings → Environment Variables → add
+     `ANTHROPIC_API_KEY = sk-ant-...` for Production and Preview, then
+     redeploy.
+   - **Local dev:** create `.env.local` with
+     `ANTHROPIC_API_KEY=sk-ant-...` and restart `npm run dev`.
+
+The route defaults to `claude-opus-4-7`. For a faster / cheaper run on
+this simple extraction task, swap `model` to `claude-haiku-4-5` in
+`app/api/estimate-food/route.ts`.
+
 To install as an app:
 
 - **iPhone / Safari** → Share → "Add to Home Screen"
