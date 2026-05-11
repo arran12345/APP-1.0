@@ -12,9 +12,11 @@ import {
   useStore,
 } from "@/lib/store";
 import { todayKey } from "@/lib/date";
-import { Plus, Trash2 } from "lucide-react";
+import { HeartPulse, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MetricChart } from "./MetricChart";
+import { TrainingSection } from "./TrainingSection";
+import { NutritionSection } from "./NutritionSection";
 import type { BodyMetric } from "@/lib/types";
 import { format, parseISO } from "date-fns";
 
@@ -30,17 +32,17 @@ export function ProgressScreen() {
   const [date, setDate] = useState(todayKey());
   const [weight, setWeight] = useState("");
   const [bf, setBf] = useState("");
-  const [range, setRange] = useState<Range>(60);
+  const [range, setRange] = useState<Range>(30);
 
   const series = useMemo(
     () => selectMetricSeries(metrics, range),
     [metrics, range],
   );
-
   const latest = selectLatestMetric(metrics);
 
-  // trend = latest vs earliest in selected range
-  const trend = useMemo(() => {
+  // Weight delta = latest vs earliest in selected range (only counting points
+  // that actually have a weight value).
+  const weightTrend = useMemo(() => {
     const weights = series.filter((m) => m.weight != null);
     if (weights.length < 2) return null;
     const first = weights[0].weight!;
@@ -64,101 +66,128 @@ export function ProgressScreen() {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="p-4">
-          <Stat
-            label="Weight"
-            value={latest?.weight ? latest.weight.toFixed(1) : "—"}
-            unit={latest?.weight ? settings.unit : undefined}
-            trend={
-              trend
-                ? { delta: trend.delta, suffix: ` ${settings.unit}` }
-                : undefined
-            }
-          />
-        </Card>
-        <Card className="p-4">
-          <Stat
-            label="Body fat"
-            value={latest?.bodyFat ? latest.bodyFat.toFixed(1) : "—"}
-            unit={latest?.bodyFat ? "%" : undefined}
-          />
-          <p className="text-2xs text-ink-dim mt-2">
-            {latest ? `Logged ${format(parseISO(latest.date), "MMM d")}` : "No data"}
-          </p>
-        </Card>
+      {/* Shared range toggle. Sits above all three sections so the whole page
+          reflects the same time window. */}
+      <div className="flex items-center justify-between px-1">
+        <span className="text-2xs uppercase tracking-widest text-ink-dim">
+          Range
+        </span>
+        <div className="inline-flex bg-bg-elev border border-line rounded-md p-0.5">
+          {([30, 60, 180] as Range[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={[
+                "px-3 h-7 rounded text-2xs font-medium tracking-wide transition-colors",
+                range === r
+                  ? "bg-bg-hover text-ink"
+                  : "text-ink-muted hover:text-ink",
+              ].join(" ")}
+            >
+              {r}d
+            </button>
+          ))}
+        </div>
       </div>
 
-      <Card>
-        <CardHeader
-          title="Trend"
-          subtitle={
-            series.length > 0
-              ? `${series.length} entr${series.length === 1 ? "y" : "ies"}`
-              : "No data yet"
-          }
-          trailing={
-            <div className="inline-flex bg-bg-elev border border-line rounded-md p-0.5">
-              {([30, 60, 180] as Range[]).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRange(r)}
-                  className={[
-                    "px-2.5 h-7 rounded text-2xs font-medium tracking-wide transition-colors",
-                    range === r
-                      ? "bg-bg-hover text-ink"
-                      : "text-ink-muted hover:text-ink",
-                  ].join(" ")}
-                >
-                  {r}d
-                </button>
-              ))}
-            </div>
-          }
-        />
-        <CardBody>
-          {series.length < 2 ? (
-            <div className="h-44 flex items-center justify-center text-xs text-ink-dim">
-              {series.length === 0
-                ? "Log two entries to see a chart."
-                : "One more entry needed."}
-            </div>
-          ) : (
-            <MetricChart data={series} unit={settings.unit} />
-          )}
-        </CardBody>
-      </Card>
+      {/* ----- Body section ----- */}
+      <section className="space-y-3">
+        <div className="flex items-center gap-2 px-1">
+          <HeartPulse size={13} className="text-accent" />
+          <h2 className="text-2xs uppercase tracking-widest text-ink-muted">
+            Body
+          </h2>
+        </div>
 
-      <Button
-        variant="primary"
-        size="lg"
-        className="w-full"
-        onClick={() => {
-          setDate(todayKey());
-          setOpen(true);
-        }}
-      >
-        <Plus size={16} strokeWidth={2.5} /> Log measurement
-      </Button>
-
-      <SectionLabel>History</SectionLabel>
-      {metrics.length === 0 ? (
-        <Empty
-          title="No measurements yet"
-          hint="Log your bodyweight and body fat % to see trends."
-        />
-      ) : (
-        <Card className="divide-y divide-line overflow-hidden">
-          {metrics.slice(0, 12).map((m) => (
-            <MetricRow
-              key={m.id}
-              m={m}
-              unit={settings.unit}
-              onRemove={() => removeMetric(m.id)}
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="p-4">
+            <Stat
+              label="Weight"
+              value={latest?.weight ? latest.weight.toFixed(1) : "—"}
+              unit={latest?.weight ? settings.unit : undefined}
+              trend={
+                weightTrend
+                  ? { delta: weightTrend.delta, suffix: ` ${settings.unit}` }
+                  : undefined
+              }
             />
-          ))}
+          </Card>
+          <Card className="p-4">
+            <Stat
+              label="Body fat"
+              value={latest?.bodyFat ? latest.bodyFat.toFixed(1) : "—"}
+              unit={latest?.bodyFat ? "%" : undefined}
+            />
+            <p className="text-2xs text-ink-dim mt-2">
+              {latest
+                ? `Logged ${format(parseISO(latest.date), "MMM d")}`
+                : "No data"}
+            </p>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader
+            title="Weight trend"
+            subtitle={
+              series.length > 0
+                ? `${series.length} entr${series.length === 1 ? "y" : "ies"}`
+                : "No data yet"
+            }
+          />
+          <CardBody>
+            {series.length < 2 ? (
+              <div className="h-44 flex items-center justify-center text-xs text-ink-dim">
+                {series.length === 0
+                  ? "Log two entries to see a chart."
+                  : "One more entry needed."}
+              </div>
+            ) : (
+              <MetricChart data={series} unit={settings.unit} />
+            )}
+          </CardBody>
         </Card>
-      )}
+
+        <Button
+          variant="primary"
+          size="lg"
+          className="w-full"
+          onClick={() => {
+            setDate(todayKey());
+            setOpen(true);
+          }}
+        >
+          <Plus size={16} strokeWidth={2.5} /> Log measurement
+        </Button>
+      </section>
+
+      {/* ----- Training section ----- */}
+      <TrainingSection rangeDays={range} unit={settings.unit} />
+
+      {/* ----- Nutrition section ----- */}
+      <NutritionSection rangeDays={range} />
+
+      {/* ----- Body metric history ----- */}
+      <section>
+        <SectionLabel>History</SectionLabel>
+        {metrics.length === 0 ? (
+          <Empty
+            title="No measurements yet"
+            hint="Log your bodyweight and body fat % to see trends."
+          />
+        ) : (
+          <Card className="divide-y divide-line overflow-hidden">
+            {metrics.slice(0, 12).map((m) => (
+              <MetricRow
+                key={m.id}
+                m={m}
+                unit={settings.unit}
+                onRemove={() => removeMetric(m.id)}
+              />
+            ))}
+          </Card>
+        )}
+      </section>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Log measurement">
         <div className="space-y-3">

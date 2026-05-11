@@ -6,7 +6,7 @@ export default function ProgressPage() {
   return (
     <>
       <AppHeader title="Progress" subtitle="Body metrics & trends" />
-      <main className="app-container pt-4 space-y-4">
+      <main className="app-container pt-4 space-y-6">
         <Hydrated>
           <ProgressScreen />
         </Hydrated>

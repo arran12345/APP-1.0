@@ -380,3 +380,185 @@ export function selectDaysSinceLastGym(workouts: Workout[]): number | null {
   if (!last) return null;
   return differenceInCalendarDays(new Date(), fromKey(last));
 }
+
+// ---------------------------------------------------------------------------
+// Progress page selectors — training & nutrition trends.
+// ---------------------------------------------------------------------------
+
+export interface ExerciseTrendPoint {
+  date: DateKey;
+  topWeight: number;   // best weight × reps set that day (by weight, tiebreak reps)
+  topReps: number;
+  volume: number;      // total kg lifted for done sets that day
+}
+
+/**
+ * Per-day aggregates for an exercise over the past `days`. Multiple workouts
+ * on the same day collapse into one point (max top weight, summed volume).
+ * Returned oldest-first so charts render left→right.
+ */
+export function selectExerciseTrend(
+  workouts: Workout[],
+  name: string,
+  days: number,
+): ExerciseTrendPoint[] {
+  const target = name.trim().toLowerCase();
+  const cutoff = addDays(new Date(), -days);
+  const byDate = new Map<DateKey, ExerciseTrendPoint>();
+  for (const w of workouts) {
+    if (parseISO(w.date) < cutoff) continue;
+    for (const e of w.exercises) {
+      if (e.name.trim().toLowerCase() !== target) continue;
+      const done = e.sets.filter((s) => s.done);
+      if (done.length === 0) continue;
+      const top = done.reduce((a, b) =>
+        b.weight > a.weight || (b.weight === a.weight && b.reps > a.reps) ? b : a,
+      );
+      const vol = done.reduce((sum, s) => sum + s.reps * s.weight, 0);
+      const cur = byDate.get(w.date);
+      if (!cur) {
+        byDate.set(w.date, {
+          date: w.date,
+          topWeight: top.weight,
+          topReps: top.reps,
+          volume: vol,
+        });
+      } else {
+        if (top.weight > cur.topWeight) {
+          cur.topWeight = top.weight;
+          cur.topReps = top.reps;
+        }
+        cur.volume += vol;
+      }
+    }
+  }
+  return Array.from(byDate.values()).sort((a, b) =>
+    a.date < b.date ? -1 : 1,
+  );
+}
+
+/** Unique exercise names across all workouts, sorted by most recent use. */
+export function selectExerciseNames(workouts: Workout[]): string[] {
+  const seen = new Set<string>();
+  const ordered: string[] = [];
+  for (const w of workouts) {
+    for (const e of w.exercises) {
+      const n = e.name.trim();
+      if (!n || seen.has(n)) continue;
+      seen.add(n);
+      ordered.push(n);
+    }
+  }
+  return ordered;
+}
+
+export interface NutritionTrendPoint {
+  date: DateKey;
+  calories: number;
+  protein: number;
+}
+
+/**
+ * Per-day calorie + protein totals for the last `days` days, with zero-filled
+ * gaps so charts don't compress sparse data.
+ */
+export function selectNutritionTrend(
+  food: FoodEntry[],
+  days: number,
+): NutritionTrendPoint[] {
+  const today = new Date();
+  // Build a same-day lookup once, then walk the date range.
+  const byDate = new Map<DateKey, NutritionTrendPoint>();
+  for (let i = days - 1; i >= 0; i--) {
+    const k = toKey(addDays(today, -i));
+    byDate.set(k, { date: k, calories: 0, protein: 0 });
+  }
+  for (const f of food) {
+    const slot = byDate.get(f.date);
+    if (!slot) continue;
+    slot.calories += f.calories;
+    slot.protein += f.protein;
+  }
+  return Array.from(byDate.values());
+}
+
+export interface NutritionAverages {
+  avgCalories: number;
+  avgProtein: number;
+  daysLogged: number;
+  daysHitCalories: number;
+  daysHitProtein: number;
+}
+
+/** Averages over days that had ANY food logged (skipping zero-days). */
+export function selectNutritionAverages(
+  trend: NutritionTrendPoint[],
+  calTarget: number,
+  proTarget: number,
+): NutritionAverages {
+  const logged = trend.filter((p) => p.calories > 0 || p.protein > 0);
+  const daysLogged = logged.length;
+  if (daysLogged === 0) {
+    return {
+      avgCalories: 0,
+      avgProtein: 0,
+      daysLogged: 0,
+      daysHitCalories: 0,
+      daysHitProtein: 0,
+    };
+  }
+  const sumCal = logged.reduce((s, p) => s + p.calories, 0);
+  const sumPro = logged.reduce((s, p) => s + p.protein, 0);
+  // "Hit" = within 10% of target either direction for calories; ≥ target for protein.
+  const hitCal = logged.filter(
+    (p) => Math.abs(p.calories - calTarget) <= calTarget * 0.1,
+  ).length;
+  const hitPro = logged.filter((p) => p.protein >= proTarget).length;
+  return {
+    avgCalories: Math.round(sumCal / daysLogged),
+    avgProtein: Math.round(sumPro / daysLogged),
+    daysLogged,
+    daysHitCalories: hitCal,
+    daysHitProtein: hitPro,
+  };
+}
+
+export interface TrainingSummary {
+  sessions: number;
+  totalSets: number;
+  totalVolume: number;
+}
+
+export function selectTrainingSummary(
+  workouts: Workout[],
+  days: number,
+): TrainingSummary {
+  const cutoff = addDays(new Date(), -days);
+  const inRange = workouts.filter(
+    (w) => parseISO(w.date) >= cutoff && w.exercises.length > 0,
+  );
+  let totalSets = 0;
+  let totalVolume = 0;
+  for (const w of inRange) {
+    for (const e of w.exercises) {
+      for (const s of e.sets) {
+        if (!s.done) continue;
+        totalSets += 1;
+        totalVolume += s.reps * s.weight;
+      }
+    }
+  }
+  return { sessions: inRange.length, totalSets, totalVolume };
+}
+
+/**
+ * For a given trend, the delta = last value − first value of the points that
+ * actually have data. Used as the headline "you went up X" indicator.
+ */
+export function trendDelta(
+  points: { value: number }[],
+): number | null {
+  const nonzero = points.filter((p) => p.value > 0);
+  if (nonzero.length < 2) return null;
+  return +(nonzero[nonzero.length - 1].value - nonzero[0].value).toFixed(1);
+}
