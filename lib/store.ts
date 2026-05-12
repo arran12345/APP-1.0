@@ -312,12 +312,108 @@ export const useStore = create<State>()(
         set((s) => ({ sleep: s.sleep.filter((x) => x.id !== id) })),
     }),
     {
+      // User-scoped persistence. The custom storage adapter rewrites every
+      // read/write to include the currently-signed-in user id, so each
+      // account has its own data namespace in localStorage. See `pulse:v1`
+      // legacy data is migrated to the first account that signs in (see
+      // setStoreUser below).
       name: "pulse:v1",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => userScopedStorage),
       version: 1,
     },
   ),
 );
+
+// ---------------------------------------------------------------------------
+// User-scoped storage adapter
+// ---------------------------------------------------------------------------
+
+const LEGACY_KEY = "pulse:v1";
+const LEGACY_MIGRATED_FLAG = "pulse:v1:legacy-migrated";
+
+const DEFAULT_DATA = {
+  settings: DEFAULT_SETTINGS,
+  workouts: [] as Workout[],
+  metrics: [] as BodyMetric[],
+  food: [] as FoodEntry[],
+  sleep: [] as SleepEntry[],
+};
+
+function readActiveUserId(): string | null {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const session = JSON.parse(localStorage.getItem("pulse:session") ?? "{}");
+    return session?.userId ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function namespacedKey(): string {
+  const userId = readActiveUserId();
+  // Anonymous bucket: data accumulated before sign-in goes here. It will be
+  // migrated to the first account that signs in (see setStoreUser).
+  return userId ? `pulse:v1:user_${userId}` : LEGACY_KEY;
+}
+
+const userScopedStorage = {
+  getItem(_name: string): string | null {
+    if (typeof localStorage === "undefined") return null;
+    return localStorage.getItem(namespacedKey());
+  },
+  setItem(_name: string, value: string): void {
+    if (typeof localStorage === "undefined") return;
+    localStorage.setItem(namespacedKey(), value);
+  },
+  removeItem(_name: string): void {
+    if (typeof localStorage === "undefined") return;
+    localStorage.removeItem(namespacedKey());
+  },
+};
+
+/**
+ * Switch the data store to a different user (or to no user on sign-out).
+ *
+ * Called by the AuthGate when the auth state changes. Loads the new user's
+ * data into the in-memory store; if the new user has no saved data yet AND
+ * there's pre-account legacy data sitting at `pulse:v1`, that legacy data
+ * is one-time-migrated into the new user's bucket. After migration the
+ * legacy bucket is preserved (just orphaned) so nothing is lost.
+ */
+export function setStoreUser(userId: string | null): void {
+  if (typeof localStorage === "undefined") {
+    useStore.setState(DEFAULT_DATA);
+    return;
+  }
+
+  // One-time migration: pre-account data → first account that signs in.
+  if (userId && !localStorage.getItem(LEGACY_MIGRATED_FLAG)) {
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    const target = `pulse:v1:user_${userId}`;
+    if (legacy && !localStorage.getItem(target)) {
+      localStorage.setItem(target, legacy);
+    }
+    localStorage.setItem(LEGACY_MIGRATED_FLAG, "true");
+  }
+
+  // Load the active bucket's data into the store. setState bypasses the
+  // persist middleware's write-through so it doesn't clobber the bucket we
+  // just read from with the data we're loading into memory (idempotent
+  // either way, but cleaner not to round-trip).
+  const key = userId ? `pulse:v1:user_${userId}` : LEGACY_KEY;
+  const raw = localStorage.getItem(key);
+  if (!raw) {
+    useStore.setState(DEFAULT_DATA);
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    const state = parsed?.state ?? parsed;
+    useStore.setState({ ...DEFAULT_DATA, ...state });
+  } catch {
+    useStore.setState(DEFAULT_DATA);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Selectors (pure functions over state — keep components dumb)

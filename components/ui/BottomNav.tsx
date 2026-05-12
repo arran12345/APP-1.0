@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Activity, Apple, Dumbbell, Home, LineChart, Moon } from "lucide-react";
+import { useProfile } from "@/lib/profile";
+import { Activity, Apple, Dumbbell, Home, LineChart, Moon, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -13,8 +14,13 @@ const items = [
   { href: "/progress", label: "Progress", icon: LineChart },
 ] as const;
 
+// Routes where the bottom nav and the profile button should NOT appear —
+// chrome would just be a distraction during login / onboarding flows.
+const HIDE_CHROME = new Set(["/login", "/onboarding"]);
+
 export function BottomNav() {
   const pathname = usePathname();
+  if (HIDE_CHROME.has(pathname)) return null;
   return (
     <nav
       aria-label="Primary"
@@ -53,7 +59,9 @@ export function BottomNav() {
   );
 }
 
-// AppHeader — slim top header used across screens.
+// AppHeader — slim top header used across screens. Renders a profile
+// avatar on the right by default so the user always has a one-tap path to
+// their profile / sign-out. Pass an explicit `trailing` to override.
 export function AppHeader({
   title,
   subtitle,
@@ -63,6 +71,8 @@ export function AppHeader({
   subtitle?: React.ReactNode;
   trailing?: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const showProfileButton = !HIDE_CHROME.has(pathname);
   return (
     <header
       className="sticky top-0 z-30 bg-bg/85 backdrop-blur-md border-b border-line"
@@ -80,8 +90,26 @@ export function AppHeader({
             </div>
           ) : null}
         </div>
-        {trailing}
+        {trailing ?? (showProfileButton ? <ProfileAvatarLink /> : null)}
       </div>
     </header>
+  );
+}
+
+function ProfileAvatarLink() {
+  const photo = useProfile((s) => s.profile?.photoDataUrl);
+  return (
+    <Link
+      href="/profile"
+      aria-label="Profile"
+      className="h-9 w-9 rounded-full bg-bg-elev border border-line overflow-hidden flex items-center justify-center hover:bg-bg-hover transition-colors shrink-0"
+    >
+      {photo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={photo} alt="" className="w-full h-full object-cover" />
+      ) : (
+        <User size={15} className="text-ink-muted" />
+      )}
+    </Link>
   );
 }

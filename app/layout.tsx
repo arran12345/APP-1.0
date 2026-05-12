@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { AuthGate } from "@/components/AuthGate";
 import { BottomNav } from "@/components/ui/BottomNav";
 import "./globals.css";
 
@@ -33,8 +34,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-bg text-ink min-h-dvh antialiased">
-        {children}
-        <BottomNav />
+        <AuthGate>
+          {children}
+          <BottomNav />
+        </AuthGate>
       </body>
     </html>
   );
