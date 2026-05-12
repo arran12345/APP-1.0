@@ -1,0 +1,104 @@
+---
+import LogoMark from './LogoMark.astro';
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <div class="footer__brand-row">
+        <LogoMark size={32} color="#F2EBDD" />
+        <span class="footer__wordmark">WESTON</span>
+      </div>
+      <p class="footer__tag">Old furniture, <span class="accent">new stories.</span></p>
+    </div>
+
+    <div class="footer__col">
+      <h4 class="label">Explore</h4>
+      <ul>
+        <li><a href="/#pieces">Pieces</a></li>
+        <li><a href="/#story">Story</a></li>
+        <li><a href="/#commissions">Commissions</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h4 class="label">Follow</h4>
+      <ul>
+        <li><a href="https://instagram.com/weston" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        <li><a href="https://tiktok.com/@weston" target="_blank" rel="noopener noreferrer">TikTok</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer__strip container">
+    <span>© {year} Weston</span>
+    <span>Handcrafted in the UK</span>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--navy);
+    color: var(--cream);
+    padding-top: 4rem;
+  }
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--hairline-light);
+  }
+  .footer__brand-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .footer__wordmark {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+  }
+  .footer__tag {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    line-height: 1.4;
+    max-width: 22rem;
+    color: rgba(242, 235, 221, 0.85);
+  }
+
+  .footer__col h4 {
+    color: rgba(242, 235, 221, 0.55);
+    margin-bottom: 1rem;
+  }
+  .footer__col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .footer__col a {
+    color: var(--cream);
+    transition: color 160ms ease;
+  }
+  .footer__col a:hover { color: var(--olive); }
+
+  .footer__strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    padding-bottom: 1.75rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(242, 235, 221, 0.7);
+  }
+
+  @media (max-width: 760px) {
+    .footer__inner { grid-template-columns: 1fr; }
+    .footer__strip { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+  }
+</style>

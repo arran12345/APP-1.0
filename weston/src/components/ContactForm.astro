@@ -1,0 +1,278 @@
+---
+// Contact section: enquiry intro + form.
+// Form posts to Formspree (or any form endpoint) configured via env.
+// The pre-fill logic is handled client-side via query params.
+const formspree = import.meta.env.FORMSPREE_ENDPOINT ?? '';
+---
+<section class="contact section" id="contact">
+  <div class="container contact__inner">
+    <div class="contact__intro">
+      <span class="section-num">iv.</span>
+      <h2 class="h2">Let's <span class="accent">talk.</span></h2>
+      <p class="contact__lede">
+        Got a question, a piece you'd like to enquire about, or a commission in
+        mind? Drop us a message and we'll come back to you within 48 hours.
+      </p>
+
+      <ul class="contact__details">
+        <li>
+          <span class="label muted">Email</span>
+          <a href="mailto:hello@weston.co.uk">hello@weston.co.uk</a>
+        </li>
+        <li>
+          <span class="label muted">Instagram</span>
+          <a href="https://instagram.com/weston" target="_blank" rel="noopener noreferrer">@weston</a>
+        </li>
+        <li>
+          <span class="label muted">Workshop</span>
+          <span>By appointment only</span>
+        </li>
+      </ul>
+
+      <p class="contact__note">
+        <strong>Delivery:</strong> Local collection from our workshop is free.
+        We also offer delivery within a 30-mile radius for a small fee — get in
+        touch with your postcode for a quote.
+      </p>
+    </div>
+
+    <form
+      class="form"
+      id="enquiry-form"
+      method="POST"
+      action={formspree || '#'}
+      novalidate
+    >
+      <div class="field">
+        <label for="name">Name <span aria-hidden="true">*</span></label>
+        <input id="name" name="name" type="text" required autocomplete="name" />
+        <p class="field__error" data-error="name" hidden>Please enter your name.</p>
+      </div>
+
+      <div class="field">
+        <label for="email">Email <span aria-hidden="true">*</span></label>
+        <input id="email" name="email" type="email" required autocomplete="email" />
+        <p class="field__error" data-error="email" hidden>Please enter a valid email address.</p>
+      </div>
+
+      <div class="field">
+        <label for="type">Enquiry type</label>
+        <select id="type" name="type">
+          <option value="general">General Enquiry</option>
+          <option value="piece">Piece Enquiry</option>
+          <option value="commission">Commission</option>
+          <option value="trade">Trade / Wholesale</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="message">Message <span aria-hidden="true">*</span></label>
+        <textarea id="message" name="message" rows="6" required></textarea>
+        <p class="field__error" data-error="message" hidden>Please tell us a little about your enquiry.</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Send Message</button>
+
+      <p class="form__status" data-status hidden></p>
+      {!formspree && (
+        <p class="form__hint label muted">
+          Form endpoint not configured. Set <code>FORMSPREE_ENDPOINT</code> in your env to enable sending.
+        </p>
+      )}
+    </form>
+  </div>
+</section>
+
+<style>
+  .contact__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  .contact__intro h2 { margin-top: 0.75rem; margin-bottom: 1.5rem; }
+  .contact__lede {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(46, 46, 46, 0.8);
+    margin-bottom: 2.5rem;
+    max-width: 28rem;
+  }
+
+  .contact__details {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--hairline);
+  }
+  .contact__details li {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+  .contact__details a:hover { color: var(--olive); }
+
+  .contact__note {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.92rem;
+    color: rgba(46, 46, 46, 0.72);
+    line-height: 1.6;
+  }
+  .contact__note strong { color: var(--charcoal); }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background: var(--cream-light);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border: 1px solid var(--hairline);
+  }
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    background: var(--cream);
+    border: 1px solid var(--hairline);
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    color: var(--charcoal);
+    transition: border-color 160ms ease;
+  }
+  .field textarea { resize: vertical; min-height: 8rem; font-family: var(--font-sans); }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--olive);
+  }
+  .field input[aria-invalid='true'],
+  .field textarea[aria-invalid='true'],
+  .field select[aria-invalid='true'] {
+    border-color: #a04848;
+  }
+  .field__error {
+    font-size: 0.82rem;
+    color: #a04848;
+  }
+  .form__status {
+    font-size: 0.9rem;
+  }
+  .form__status[data-state='success'] { color: var(--olive-dark); }
+  .form__status[data-state='error'] { color: #a04848; }
+  .form__hint { margin-top: -0.5rem; }
+  .form__hint code {
+    background: var(--cream);
+    padding: 0.1rem 0.35rem;
+    border: 1px solid var(--hairline);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 900px) {
+    .contact__inner { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  // Pre-fill from query string: ?type=commission and ?piece=<slug>
+  // Plus client-side required-field validation and Formspree submission.
+  const form = document.getElementById('enquiry-form') as HTMLFormElement | null;
+  if (form) {
+    const params = new URLSearchParams(window.location.search);
+
+    const typeParam = params.get('type');
+    if (typeParam) {
+      const select = form.querySelector<HTMLSelectElement>('#type');
+      if (select && Array.from(select.options).some((o) => o.value === typeParam)) {
+        select.value = typeParam;
+      }
+    }
+
+    const pieceParam = params.get('piece');
+    if (pieceParam) {
+      const msg = form.querySelector<HTMLTextAreaElement>('#message');
+      const select = form.querySelector<HTMLSelectElement>('#type');
+      if (msg && !msg.value) {
+        const pretty = pieceParam.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+        msg.value = `I'm enquiring about ${pretty}.`;
+      }
+      if (select) select.value = 'piece';
+    }
+
+    const status = form.querySelector<HTMLElement>('[data-status]');
+    const setStatus = (msg: string, state: 'success' | 'error') => {
+      if (!status) return;
+      status.textContent = msg;
+      status.dataset.state = state;
+      status.hidden = false;
+    };
+
+    const showError = (name: string, show: boolean) => {
+      const input = form.querySelector<HTMLElement>(`[name="${name}"]`);
+      const err = form.querySelector<HTMLElement>(`[data-error="${name}"]`);
+      if (!input || !err) return;
+      err.hidden = !show;
+      input.setAttribute('aria-invalid', show ? 'true' : 'false');
+    };
+
+    const validate = (): boolean => {
+      let ok = true;
+      const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
+      const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
+      const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value.trim();
+
+      showError('name', !name); if (!name) ok = false;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      showError('email', !emailOk); if (!emailOk) ok = false;
+      showError('message', !message); if (!message) ok = false;
+      return ok;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+
+      const action = form.getAttribute('action');
+      if (!action || action === '#') {
+        setStatus('Form endpoint not yet configured. (Set FORMSPREE_ENDPOINT.)', 'error');
+        return;
+      }
+
+      const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const data = new FormData(form);
+        const res = await fetch(action, {
+          method: 'POST',
+          body: data,
+          headers: { Accept: 'application/json' },
+        });
+        if (res.ok) {
+          form.reset();
+          setStatus("Thanks — we'll be in touch within 48 hours.", 'success');
+        } else {
+          setStatus('Something went wrong. Please email hello@weston.co.uk instead.', 'error');
+        }
+      } catch {
+        setStatus('Network error. Please email hello@weston.co.uk instead.', 'error');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+</script>

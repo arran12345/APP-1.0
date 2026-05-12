@@ -1,0 +1,91 @@
+---
+// Commissions — charcoal background, cream text. Three-step layout.
+const steps = [
+  {
+    n: '01',
+    title: 'Tell us about it',
+    body: 'Got a piece of furniture you want reworked? Send us a few photos, the dimensions, and the kind of finish you\'re imagining.',
+  },
+  {
+    n: '02',
+    title: "We'll quote",
+    body: "Within 48 hours we'll come back with a price, a timeline, and a few finish suggestions if you're undecided. No pressure, no hidden costs.",
+  },
+  {
+    n: '03',
+    title: 'We make it',
+    body: 'We collect the piece, transform it in our workshop, and deliver it back to you ready to live with for another generation.',
+  },
+];
+---
+<section class="commissions section" id="commissions">
+  <div class="container">
+    <header class="commissions__head">
+      <span class="section-num">iii.</span>
+      <h2 class="h2">Have a piece in mind? <span class="accent">Commission it.</span></h2>
+    </header>
+
+    <ol class="commissions__steps">
+      {steps.map((s) => (
+        <li class="step">
+          <span class="step__num">{s.n}</span>
+          <h3 class="step__title">{s.title}</h3>
+          <p class="step__body">{s.body}</p>
+        </li>
+      ))}
+    </ol>
+
+    <div class="commissions__cta">
+      <a class="btn btn-cream" href="/?type=commission#contact">Start a Commission</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .commissions {
+    background: var(--charcoal);
+    color: var(--cream);
+  }
+  .commissions .section-num { color: var(--olive); }
+  .commissions__head { text-align: center; margin-bottom: 4rem; }
+  .commissions__head .section-num { display: block; }
+
+  .commissions__steps {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding: 0;
+  }
+  .step {
+    padding: 2rem 0;
+    border-top: 1px solid var(--hairline-light);
+  }
+  .step__num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--olive);
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  .step__title {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 1.65rem;
+    margin-bottom: 0.85rem;
+  }
+  .step__body {
+    color: rgba(242, 235, 221, 0.78);
+    line-height: 1.7;
+  }
+
+  .commissions__cta {
+    margin-top: 3.5rem;
+    text-align: center;
+  }
+
+  @media (max-width: 800px) {
+    .commissions__steps { grid-template-columns: 1fr; }
+  }
+</style>

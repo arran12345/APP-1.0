@@ -1,0 +1,228 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import PieceCard from '../../components/PieceCard.astro';
+import pieces from '../../data/pieces.json';
+
+export function getStaticPaths() {
+  return pieces.map((p) => ({ params: { slug: p.id }, props: { piece: p } }));
+}
+
+interface Piece {
+  id: string;
+  name: string;
+  category: string;
+  colour: string;
+  price: number;
+  status: 'available' | 'sold' | 'reserved';
+  dimensions: string;
+  description: string;
+  story: string;
+  images: string[];
+  featured: boolean;
+}
+
+const { piece } = Astro.props as { piece: Piece };
+
+const formattedPrice = new Intl.NumberFormat('en-GB', {
+  style: 'currency',
+  currency: 'GBP',
+  maximumFractionDigits: 0,
+}).format(piece.price);
+
+const statusLabels = {
+  available: 'Available',
+  sold: 'Sold',
+  reserved: 'Reserved',
+};
+
+const more = pieces.filter((p) => p.id !== piece.id).slice(0, 3);
+
+// Schema.org Product (no offer block — not sold online; SEO only)
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: piece.name,
+  description: piece.description,
+  category: piece.category,
+  color: piece.colour,
+  image: piece.images.map((src) => new URL(src, Astro.site ?? 'https://weston.co.uk').toString()),
+  brand: { '@type': 'Brand', name: 'Weston' },
+};
+---
+<Base
+  title={`${piece.name} — Weston`}
+  description={piece.description}
+  ogImage={piece.images[0]}
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(schema)} />
+  <Nav fromSubpage />
+
+  <main id="main" class="piece">
+    <div class="container">
+      <a class="piece__back label" href="/#pieces">← All Pieces</a>
+    </div>
+
+    <article class="piece__article container">
+      <div class="piece__gallery">
+        <div class="piece__main-image">
+          <img
+            src={piece.images[0]}
+            alt={`${piece.name} — ${piece.category.toLowerCase()} in ${piece.colour.toLowerCase()}`}
+            width="800"
+            height="1000"
+            decoding="async"
+          />
+        </div>
+        {piece.images.length > 1 && (
+          <ul class="piece__thumbs">
+            {piece.images.map((src, i) => (
+              <li>
+                <img src={src} alt={`${piece.name} — view ${i + 1}`} loading="lazy" />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <aside class="piece__info">
+        <h1 class="piece__name h1">{piece.name}</h1>
+        <p class="label muted piece__meta">{piece.category} · {piece.colour}</p>
+
+        <div class="piece__price-row">
+          <span class="piece__price">{formattedPrice}</span>
+          <span class={`tag tag-${piece.status}`}>{statusLabels[piece.status]}</span>
+        </div>
+
+        <hr class="hairline" />
+
+        <p class="piece__description">{piece.description}</p>
+
+        <dl class="piece__dl">
+          <dt class="label muted">Dimensions</dt>
+          <dd>{piece.dimensions} <span class="muted">(W × D × H)</span></dd>
+        </dl>
+
+        <a class="btn btn-primary piece__cta" href={`/?piece=${piece.id}#contact`}>
+          Enquire About This Piece
+        </a>
+
+        <p class="muted piece__delivery">
+          Local collection from our workshop is free. We deliver within a
+          30-mile radius — message us with your postcode for a quote.
+        </p>
+      </aside>
+    </article>
+
+    <section class="piece__story-section section">
+      <div class="container piece__story-wrap">
+        <span class="section-num">i.</span>
+        <h2 class="h2">The <span class="accent">Story.</span></h2>
+        <p class="piece__story">{piece.story}</p>
+      </div>
+    </section>
+
+    <section class="piece__more section">
+      <div class="container">
+        <header class="piece__more-head">
+          <span class="section-num">ii.</span>
+          <h2 class="h2">More <span class="accent">Pieces.</span></h2>
+        </header>
+        <div class="piece__more-grid">
+          {more.map((p) => <PieceCard piece={p} />)}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  .piece { padding-top: 2.5rem; }
+  .piece__back {
+    display: inline-block;
+    margin-bottom: 2.5rem;
+    color: var(--charcoal);
+    transition: color 160ms ease;
+  }
+  .piece__back:hover { color: var(--olive); }
+
+  .piece__article {
+    display: grid;
+    grid-template-columns: 6fr 5fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    padding-bottom: 4rem;
+    align-items: start;
+  }
+  .piece__main-image {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--cream-light);
+  }
+  .piece__main-image img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .piece__thumbs {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  .piece__thumbs img { aspect-ratio: 1/1; object-fit: cover; cursor: pointer; }
+
+  .piece__info { position: sticky; top: 100px; }
+  .piece__name { font-size: clamp(2.25rem, 5vw, 3.5rem); margin-bottom: 0.5rem; }
+  .piece__meta { margin-bottom: 1.75rem; }
+  .piece__price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .piece__price {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    font-weight: 500;
+  }
+  .piece__description {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(46, 46, 46, 0.82);
+    margin: 1.5rem 0;
+  }
+  .piece__dl { margin-bottom: 2rem; }
+  .piece__dl dt { margin-bottom: 0.35rem; }
+  .piece__dl dd { font-size: 1rem; }
+  .piece__cta { margin-bottom: 1.5rem; }
+  .piece__delivery { font-size: 0.88rem; line-height: 1.6; }
+
+  .piece__story-section {
+    background: var(--cream-light);
+    border-top: 1px solid var(--hairline);
+  }
+  .piece__story-wrap { max-width: 44rem; }
+  .piece__story-section h2 { margin-top: 0.75rem; margin-bottom: 1.5rem; }
+  .piece__story {
+    font-size: 1.1rem;
+    line-height: 1.75;
+    color: rgba(46, 46, 46, 0.85);
+  }
+
+  .piece__more-head { text-align: center; margin-bottom: 3rem; }
+  .piece__more-head .section-num { display: block; }
+  .piece__more-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  @media (max-width: 900px) {
+    .piece__article { grid-template-columns: 1fr; }
+    .piece__info { position: static; }
+    .piece__more-grid { grid-template-columns: 1fr; }
+  }
+</style>

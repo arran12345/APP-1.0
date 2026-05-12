@@ -1,0 +1,100 @@
+---
+interface Piece {
+  id: string;
+  name: string;
+  category: string;
+  colour: string;
+  price: number;
+  status: 'available' | 'sold' | 'reserved';
+  images: string[];
+}
+interface Props {
+  piece: Piece;
+  /** Defer below-the-fold loading. */
+  loading?: 'lazy' | 'eager';
+}
+const { piece, loading = 'lazy' } = Astro.props;
+const statusLabels = {
+  available: 'Available',
+  sold: 'Sold',
+  reserved: 'Reserved',
+};
+const formattedPrice = new Intl.NumberFormat('en-GB', {
+  style: 'currency',
+  currency: 'GBP',
+  maximumFractionDigits: 0,
+}).format(piece.price);
+---
+<a class="card" href={`/pieces/${piece.id}`} aria-label={`${piece.name} — view piece`}>
+  <div class="card__image">
+    <img
+      src={piece.images[0]}
+      alt={`${piece.name} — ${piece.category.toLowerCase()} in ${piece.colour.toLowerCase()}`}
+      width="800"
+      height="1000"
+      loading={loading}
+      decoding="async"
+    />
+  </div>
+  <div class="card__body">
+    <div class="card__row">
+      <h3 class="card__name">{piece.name}</h3>
+      <span class="card__price">{formattedPrice}</span>
+    </div>
+    <div class="card__row card__row--meta">
+      <span class="label muted">{piece.category} · {piece.colour}</span>
+      <span class={`tag tag-${piece.status}`}>{statusLabels[piece.status]}</span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: block;
+    background: var(--cream-light);
+    border: 1px solid var(--hairline);
+    transition: transform 220ms ease, border-color 220ms ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(46, 46, 46, 0.25);
+  }
+  .card__image {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--cream-light);
+  }
+  .card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms ease;
+  }
+  .card:hover .card__image img { transform: scale(1.03); }
+
+  .card__body {
+    padding: 1.25rem 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .card__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .card__row--meta { align-items: center; padding-top: 0.25rem; }
+  .card__name {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  .card__price {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--charcoal);
+  }
+</style>

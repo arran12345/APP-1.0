@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="Weston — featured piece">
+  <rect width="800" height="1000" fill="#F8F3E7"/>
+  <!-- subtle vertical hairlines like workshop boards -->
+  <g opacity="0.05" stroke="#2E2E2E" stroke-width="1">
+    <line x1="100" y1="0" x2="100" y2="1000"/>
+    <line x1="240" y1="0" x2="240" y2="1000"/>
+    <line x1="380" y1="0" x2="380" y2="1000"/>
+    <line x1="520" y1="0" x2="520" y2="1000"/>
+    <line x1="660" y1="0" x2="660" y2="1000"/>
+  </g>
+  <!-- Hero piece: a tall cabinet inspired by The Tilden -->
+  <rect x="220" y="180" width="360" height="20" fill="#2E2E2E" opacity="0.9"/>
+  <rect x="230" y="200" width="340" height="640" fill="#6B7A5A"/>
+  <rect x="262" y="240" width="276" height="570" fill="#F2EBDD" opacity="0.92" stroke="#56624A" stroke-width="2"/>
+  <line x1="262" y1="380" x2="538" y2="380" stroke="#56624A" stroke-width="1"/>
+  <line x1="262" y1="525" x2="538" y2="525" stroke="#56624A" stroke-width="1"/>
+  <line x1="262" y1="670" x2="538" y2="670" stroke="#56624A" stroke-width="1"/>
+  <rect x="396" y="510" width="8" height="22" fill="#56624A"/>
+  <rect x="240" y="840" width="12" height="34" fill="#2E2E2E" opacity="0.9"/>
+  <rect x="548" y="840" width="12" height="34" fill="#2E2E2E" opacity="0.9"/>
+  <line x1="140" y1="876" x2="660" y2="876" stroke="#2E2E2E" stroke-width="1" opacity="0.18"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="The Bramley — bedside table illustration">
+  <rect width="800" height="1000" fill="#F8F3E7"/>
+  <!-- Top -->
+  <rect x="270" y="370" width="260" height="14" fill="#2E2E2E" opacity="0.85"/>
+  <!-- Body -->
+  <rect x="280" y="384" width="240" height="280" fill="#2B3A4A"/>
+  <!-- Drawer divider -->
+  <line x1="280" y1="480" x2="520" y2="480" stroke="#F2EBDD" stroke-width="1" opacity="0.6"/>
+  <!-- Knob -->
+  <circle cx="400" cy="430" r="8" fill="#F2EBDD"/>
+  <!-- Legs -->
+  <rect x="290" y="664" width="10" height="80" fill="#2E2E2E" opacity="0.85"/>
+  <rect x="500" y="664" width="10" height="80" fill="#2E2E2E" opacity="0.85"/>
+  <!-- Floor line -->
+  <line x1="200" y1="748" x2="600" y2="748" stroke="#2E2E2E" stroke-width="1" opacity="0.18"/>
+  <text x="400" y="870" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="42" font-style="italic" fill="#2E2E2E">The Bramley</text>
+</svg>

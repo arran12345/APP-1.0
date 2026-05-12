@@ -1,0 +1,70 @@
+---
+import PieceCard from './PieceCard.astro';
+import pieces from '../data/pieces.json';
+---
+<section class="pieces section" id="pieces">
+  <div class="container">
+    <header class="pieces__head">
+      <span class="section-num">i.</span>
+      <h2 class="h2">Current <span class="accent">Pieces</span></h2>
+    </header>
+
+    <div class="pieces__grid">
+      {pieces.map((piece, i) => (
+        <PieceCard piece={piece} loading={i < 3 ? 'eager' : 'lazy'} />
+      ))}
+
+      <a class="pieces__more" href="/?type=commission#contact" aria-label="More coming soon — start a commission">
+        <div class="pieces__more-inner">
+          <span class="label">More</span>
+          <span class="h3 accent" style="font-style: italic;">Coming Soon</span>
+          <span class="label muted">Or commission your own →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pieces__head {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  .pieces__head .section-num { display: block; }
+  .pieces__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .pieces__more {
+    aspect-ratio: 4 / 5;
+    border: 1px dashed rgba(46, 46, 46, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream-light);
+    transition: border-color 220ms ease, background 220ms ease;
+    /* match approximate card height including body so it sits in the grid neatly */
+    align-self: stretch;
+    aspect-ratio: auto;
+  }
+  .pieces__more:hover {
+    border-color: var(--olive);
+    background: var(--cream);
+  }
+  .pieces__more-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+    padding: 2rem;
+  }
+
+  @media (max-width: 900px) {
+    .pieces__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .pieces__grid { grid-template-columns: 1fr; }
+  }
+</style>

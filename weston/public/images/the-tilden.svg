@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="The Tilden — tall glass cabinet illustration">
+  <rect width="800" height="1000" fill="#F8F3E7"/>
+  <!-- Top -->
+  <rect x="240" y="120" width="320" height="16" fill="#2E2E2E" opacity="0.85"/>
+  <!-- Body -->
+  <rect x="250" y="136" width="300" height="620" fill="#6B7A5A"/>
+  <!-- Glass area -->
+  <rect x="278" y="170" width="244" height="560" fill="#F8F3E7" opacity="0.85" stroke="#56624A" stroke-width="2"/>
+  <!-- Shelves -->
+  <line x1="278" y1="320" x2="522" y2="320" stroke="#56624A" stroke-width="1"/>
+  <line x1="278" y1="470" x2="522" y2="470" stroke="#56624A" stroke-width="1"/>
+  <line x1="278" y1="620" x2="522" y2="620" stroke="#56624A" stroke-width="1"/>
+  <!-- Latch -->
+  <rect x="396" y="440" width="8" height="20" fill="#56624A"/>
+  <!-- Legs -->
+  <rect x="260" y="756" width="10" height="30" fill="#2E2E2E" opacity="0.85"/>
+  <rect x="530" y="756" width="10" height="30" fill="#2E2E2E" opacity="0.85"/>
+  <line x1="180" y1="788" x2="620" y2="788" stroke="#2E2E2E" stroke-width="1" opacity="0.18"/>
+  <text x="400" y="870" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="42" font-style="italic" fill="#2E2E2E">The Tilden</text>
+</svg>

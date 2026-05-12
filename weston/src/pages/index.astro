@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import PieceGrid from '../components/PieceGrid.astro';
+import Story from '../components/Story.astro';
+import Commissions from '../components/Commissions.astro';
+import ContactForm from '../components/ContactForm.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base
+  title="Weston — Handcrafted, Upcycled Furniture"
+  description="Weston rescues forgotten furniture and reworks each piece by hand. Modern farmhouse character, made to last another generation."
+>
+  <Nav />
+  <main id="main">
+    <Hero />
+    <PieceGrid />
+    <Story />
+    <Commissions />
+    <ContactForm />
+  </main>
+  <Footer />
+</Base>

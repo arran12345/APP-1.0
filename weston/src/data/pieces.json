@@ -1,0 +1,77 @@
+[
+  {
+    "id": "the-ashford",
+    "name": "The Ashford",
+    "category": "Sideboard",
+    "colour": "Olive",
+    "price": 850,
+    "status": "available",
+    "dimensions": "120 x 45 x 80 cm",
+    "description": "A long, low sideboard in soft olive chalk paint with a hand-waxed oak top and aged brass cup handles.",
+    "story": "The Ashford came to us as a 1970s teak sideboard, sun-bleached on one side and missing two handles. We stripped it back over a weekend, levelled the top, and chose olive because it suits the long, low silhouette — quietly confident without shouting. The oak top was sanded through five grits and finished with a dark hard wax that brings out the grain. Inside it's lined with unbleached cotton.",
+    "images": [
+      "/images/the-ashford.svg"
+    ],
+    "featured": true
+  },
+  {
+    "id": "the-bramley",
+    "name": "The Bramley",
+    "category": "Bedside",
+    "colour": "Navy",
+    "price": 320,
+    "status": "available",
+    "dimensions": "45 x 38 x 60 cm",
+    "description": "Compact bedside table in deep navy with a single soft-close drawer and a turned wooden knob.",
+    "story": "Found at a clearance auction with a broken runner and a coffee ring on the top. We rebuilt the drawer with new oak runners, replaced the brass-effect knob with a turned beech one, and finished it in two coats of navy chalk paint with a hand-applied wax. Small, but it earns its corner.",
+    "images": [
+      "/images/the-bramley.svg"
+    ],
+    "featured": true
+  },
+  {
+    "id": "the-eldon",
+    "name": "The Eldon",
+    "category": "Chest",
+    "colour": "Charcoal",
+    "price": 680,
+    "status": "sold",
+    "dimensions": "90 x 50 x 95 cm",
+    "description": "Six-drawer chest in deep charcoal with a limed oak top and slim iron pulls.",
+    "story": "The Eldon was a solid pine chest that had lived three lives before us — last in a garage, by the look of it. We sanded the carcass back to bare wood, repaired one drawer face, and chose charcoal for its weight against the limed oak top. The iron pulls came from a small forge in Yorkshire.",
+    "images": [
+      "/images/the-eldon.svg"
+    ],
+    "featured": true
+  },
+  {
+    "id": "the-marlow",
+    "name": "The Marlow",
+    "category": "Drawers",
+    "colour": "Cream",
+    "price": 540,
+    "status": "available",
+    "dimensions": "75 x 42 x 85 cm",
+    "description": "Four-drawer chest in warm cream with the original beaded edge detail and porcelain handles.",
+    "story": "A late-Victorian chest with the original beaded edge still intact under three layers of paint. We took our time stripping it — gentler heat, finer scrapers — to keep the detail. The cream is mixed warm to suit older oak floors, and the porcelain handles are reproductions sourced from a salvage yard near Bristol.",
+    "images": [
+      "/images/the-marlow.svg"
+    ],
+    "featured": true
+  },
+  {
+    "id": "the-tilden",
+    "name": "The Tilden",
+    "category": "Cabinet",
+    "colour": "Olive",
+    "price": 720,
+    "status": "reserved",
+    "dimensions": "80 x 40 x 180 cm",
+    "description": "Tall glass-fronted cabinet in olive with adjustable interior shelves and a brushed brass latch.",
+    "story": "The Tilden started as a tired 1950s display cabinet with cloudy glass and a sticking door. New glass, new hinges, three adjustable shelves, and a slim brass latch later, it's the piece you'd put your nicest things in. Olive again, because we keep coming back to it.",
+    "images": [
+      "/images/the-tilden.svg"
+    ],
+    "featured": true
+  }
+]

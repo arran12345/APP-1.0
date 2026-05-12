@@ -1,0 +1,61 @@
+---
+// Our Story section — cream-light background, image left / copy right.
+---
+<section class="story section" id="story">
+  <div class="container story__inner">
+    <div class="story__image">
+      <img src="/images/story.svg" alt="A workshop bench with tools and paint tins on a shelf" width="800" height="1000" loading="lazy" decoding="async" />
+    </div>
+    <div class="story__content">
+      <span class="section-num">ii.</span>
+      <h2 class="h2">Two mates, a workshop, and a love of <span class="accent">well-made things.</span></h2>
+      <div class="story__copy">
+        <p>
+          Weston started on weekends — finding tired pieces of furniture nobody
+          wanted and seeing what they could become. A chipped sideboard. A
+          bedside table missing a handle. A chest of drawers headed for the skip.
+        </p>
+        <p>
+          Every piece we put out has been stripped, sanded, and finished by hand.
+          We work with chalk-based paints, hand-waxed wooden tops, and quality
+          fixings — the kind of details that make a piece last another fifty years.
+        </p>
+        <p>It's not mass-produced. It's not perfect. That's the point.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .story {
+    background: var(--cream-light);
+  }
+  .story__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+  }
+  .story__image {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+  .story__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .story__content { max-width: 34rem; }
+  .story h2 { margin-top: 0.75rem; margin-bottom: 1.75rem; }
+  .story__copy p {
+    margin-bottom: 1.1rem;
+    color: rgba(46, 46, 46, 0.82);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .story__copy p:last-child { margin-bottom: 0; }
+
+  @media (max-width: 900px) {
+    .story__inner { grid-template-columns: 1fr; }
+  }
+</style>

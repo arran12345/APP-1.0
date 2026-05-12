@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Weston">
+  <rect width="1200" height="630" fill="#F2EBDD"/>
+  <!-- Logo mark -->
+  <g transform="translate(560 130)">
+    <rect x="0" y="0" width="80" height="80" fill="none" stroke="#2E2E2E" stroke-width="1.4"/>
+    <path d="M 18 24 L 30 60 L 40 38 L 50 60 L 62 24" fill="none" stroke="#2E2E2E" stroke-width="2.6" stroke-linecap="square" stroke-linejoin="miter"/>
+    <line x1="18" y1="66" x2="62" y2="66" stroke="#6B7A5A" stroke-width="1.4"/>
+  </g>
+  <text x="600" y="320" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="92" font-weight="500" letter-spacing="14" fill="#2E2E2E">WESTON</text>
+  <text x="600" y="400" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="40" font-style="italic" fill="#6B7A5A">Old furniture, new stories.</text>
+  <text x="600" y="470" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" letter-spacing="4" fill="#2E2E2E">HANDCRAFTED · REWORKED · RESTORED</text>
+</svg>

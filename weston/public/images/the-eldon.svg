@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="The Eldon — six-drawer chest illustration">
+  <rect width="800" height="1000" fill="#F8F3E7"/>
+  <!-- Top -->
+  <rect x="180" y="280" width="440" height="20" fill="#6B7A5A" opacity="0.55"/>
+  <!-- Body -->
+  <rect x="190" y="300" width="420" height="420" fill="#2E2E2E"/>
+  <!-- Drawer rows (3 rows, 2 cols) -->
+  <line x1="190" y1="440" x2="610" y2="440" stroke="#F2EBDD" stroke-width="1" opacity="0.45"/>
+  <line x1="190" y1="580" x2="610" y2="580" stroke="#F2EBDD" stroke-width="1" opacity="0.45"/>
+  <line x1="400" y1="300" x2="400" y2="720" stroke="#F2EBDD" stroke-width="1" opacity="0.45"/>
+  <!-- Pulls -->
+  <rect x="280" y="368" width="40" height="4" fill="#F2EBDD"/>
+  <rect x="480" y="368" width="40" height="4" fill="#F2EBDD"/>
+  <rect x="280" y="508" width="40" height="4" fill="#F2EBDD"/>
+  <rect x="480" y="508" width="40" height="4" fill="#F2EBDD"/>
+  <rect x="280" y="648" width="40" height="4" fill="#F2EBDD"/>
+  <rect x="480" y="648" width="40" height="4" fill="#F2EBDD"/>
+  <!-- Legs -->
+  <rect x="200" y="720" width="12" height="40" fill="#2E2E2E"/>
+  <rect x="588" y="720" width="12" height="40" fill="#2E2E2E"/>
+  <line x1="120" y1="762" x2="680" y2="762" stroke="#2E2E2E" stroke-width="1" opacity="0.18"/>
+  <text x="400" y="870" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="42" font-style="italic" fill="#2E2E2E">The Eldon</text>
+</svg>

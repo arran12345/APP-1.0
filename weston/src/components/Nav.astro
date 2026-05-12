@@ -1,0 +1,165 @@
+---
+import LogoMark from './LogoMark.astro';
+
+interface Props {
+  /** When true, anchor links are scoped to the homepage (e.g. /#pieces). */
+  fromSubpage?: boolean;
+}
+const { fromSubpage = false } = Astro.props;
+const prefix = fromSubpage ? '/' : '';
+
+const links = [
+  { href: `${prefix}#pieces`, label: 'Pieces' },
+  { href: `${prefix}#story`, label: 'Story' },
+  { href: `${prefix}#commissions`, label: 'Commissions' },
+  { href: `${prefix}#contact`, label: 'Contact' },
+];
+---
+<header class="nav">
+  <div class="nav__inner container">
+    <a href="/" class="nav__brand" aria-label="Weston — home">
+      <LogoMark size={28} />
+      <span class="nav__wordmark">WESTON</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      {links.map((l) => (
+        <a href={l.href}>{l.label}</a>
+      ))}
+    </nav>
+
+    <button
+      class="nav__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      aria-label="Open menu"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav__mobile" hidden>
+    <nav aria-label="Mobile">
+      {links.map((l) => (
+        <a href={l.href} data-mobile-link>{l.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(242, 235, 221, 0.85);
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+  .nav__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    color: var(--charcoal);
+  }
+  .nav__wordmark {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+  }
+  .nav__links {
+    display: flex;
+    gap: 2.25rem;
+  }
+  .nav__links a {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+    transition: color 160ms ease;
+  }
+  .nav__links a:hover { color: var(--olive); }
+
+  .nav__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .nav__toggle span {
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: var(--charcoal);
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+  .nav__toggle[aria-expanded='true'] span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+  }
+  .nav__toggle[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
+  .nav__toggle[aria-expanded='true'] span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+
+  .nav__mobile {
+    border-top: 1px solid var(--hairline);
+    background: var(--cream);
+  }
+  .nav__mobile nav {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem var(--gutter) 2rem;
+    gap: 1.25rem;
+  }
+  .nav__mobile a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  @media (max-width: 768px) {
+    .nav__links { display: none; }
+    .nav__toggle { display: inline-flex; }
+  }
+</style>
+
+<script>
+  // Minimal vanilla JS for the mobile menu — no framework dependency.
+  const toggle = document.querySelector<HTMLButtonElement>('.nav__toggle');
+  const menu = document.querySelector<HTMLElement>('#mobile-menu');
+  if (toggle && menu) {
+    const open = () => {
+      menu.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Close menu');
+    };
+    const close = () => {
+      menu.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open menu');
+    };
+    toggle.addEventListener('click', () => {
+      toggle.getAttribute('aria-expanded') === 'true' ? close() : open();
+    });
+    menu.querySelectorAll<HTMLAnchorElement>('[data-mobile-link]').forEach((a) => {
+      a.addEventListener('click', close);
+    });
+  }
+</script>
