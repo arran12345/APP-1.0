@@ -69,7 +69,7 @@ export function ExerciseBlock({ workoutId, exercise, lastTime, unit }: Props) {
       {exercise.sets.length > 0 && (
         <div className="px-4 pb-1 grid grid-cols-[1.5rem_1fr_1fr_2.25rem] items-center gap-2 text-2xs uppercase tracking-widest text-ink-dim">
           <span>#</span>
-          <span>Weight</span>
+          <span>Weight · {unit}</span>
           <span>Reps</span>
           <span />
         </div>
@@ -92,7 +92,6 @@ export function ExerciseBlock({ workoutId, exercise, lastTime, unit }: Props) {
                 updateSet(workoutId, exercise.id, set.id, { weight: n })
               }
               step={2.5}
-              suffix={unit}
             />
             <NumberStepper
               ariaLabel="reps"

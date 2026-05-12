@@ -126,7 +126,10 @@ export function NumberStepper({
           onChange={(e) => handleChange(e.target.value)}
           onBlur={handleBlur}
           style={{ width: inputWidth }}
-          className="min-w-0 max-w-full bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
+          // shrink-0 stops flex from squeezing the input below its
+          // requested width on narrow columns (the previous max-w-full
+          // class capped the input to its parent and clipped digits).
+          className="shrink-0 bg-transparent text-sm text-ink text-right font-mono tabular-nums outline-none p-0 leading-none"
         />
         {suffix && (
           <span className="text-2xs text-ink-dim shrink-0 leading-none">

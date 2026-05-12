@@ -17,7 +17,6 @@ import { useMemo, useState } from "react";
 import { MetricChart } from "./MetricChart";
 import { TrainingSection } from "./TrainingSection";
 import { NutritionSection } from "./NutritionSection";
-import { SleepSection } from "./SleepSection";
 import type { BodyMetric } from "@/lib/types";
 import { format, parseISO } from "date-fns";
 
@@ -161,9 +160,6 @@ export function ProgressScreen() {
           <Plus size={16} strokeWidth={2.5} /> Log measurement
         </Button>
       </section>
-
-      {/* ----- Sleep section ----- */}
-      <SleepSection rangeDays={range} />
 
       {/* ----- Training section ----- */}
       <TrainingSection rangeDays={range} unit={settings.unit} />

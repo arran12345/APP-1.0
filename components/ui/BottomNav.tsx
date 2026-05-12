@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Activity, Apple, Dumbbell, Home, LineChart } from "lucide-react";
+import { Activity, Apple, Dumbbell, Home, LineChart, Moon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,6 +9,7 @@ const items = [
   { href: "/", label: "Home", icon: Home },
   { href: "/workouts", label: "Workouts", icon: Dumbbell },
   { href: "/nutrition", label: "Food", icon: Apple },
+  { href: "/sleep", label: "Sleep", icon: Moon },
   { href: "/progress", label: "Progress", icon: LineChart },
 ] as const;
 
@@ -20,7 +21,7 @@ export function BottomNav() {
       className="fixed bottom-0 inset-x-0 z-40 border-t border-line bg-bg/80 backdrop-blur-md"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="mx-auto max-w-md grid grid-cols-4">
+      <ul className="mx-auto max-w-md grid grid-cols-5">
         {items.map(({ href, label, icon: Icon }) => {
           const active =
             href === "/" ? pathname === "/" : pathname.startsWith(href);

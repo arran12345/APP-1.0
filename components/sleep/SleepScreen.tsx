@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, IconButton } from "@/components/ui/Button";
-import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { Card, CardBody, CardHeader, SectionLabel } from "@/components/ui/Card";
 import { Empty } from "@/components/ui/Empty";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
@@ -13,9 +13,9 @@ import {
   useStore,
 } from "@/lib/store";
 import type { SleepQuality } from "@/lib/types";
-import { fromKey, todayKey, toKey } from "@/lib/date";
+import { todayKey, toKey } from "@/lib/date";
 import { addDays, format, parseISO } from "date-fns";
-import { Moon, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   Bar,
@@ -28,9 +28,7 @@ import {
   YAxis,
 } from "recharts";
 
-interface Props {
-  rangeDays: number;
-}
+type Range = 7 | 30 | 90;
 
 const QUALITY_LABELS: Record<SleepQuality, string> = {
   1: "Poor",
@@ -39,22 +37,19 @@ const QUALITY_LABELS: Record<SleepQuality, string> = {
   4: "Great",
 };
 
-export function SleepSection({ rangeDays }: Props) {
+export function SleepScreen() {
   const sleep = useStore((s) => s.sleep);
   const logSleep = useStore((s) => s.logSleep);
   const removeSleep = useStore((s) => s.removeSleep);
 
-  const trend = useMemo(
-    () => selectSleepTrend(sleep, rangeDays),
-    [sleep, rangeDays],
-  );
+  const [range, setRange] = useState<Range>(30);
+
+  const trend = useMemo(() => selectSleepTrend(sleep, range), [sleep, range]);
   const avg = useMemo(() => selectSleepAverages(trend), [trend]);
   const latest = selectLatestSleep(sleep);
   const hasData = avg.nightsLogged > 0;
 
   const [open, setOpen] = useState(false);
-  // Default to last night (= yesterday). Most people log in the morning,
-  // so "yesterday" maps to the night they just woke up from.
   const [date, setDate] = useState(toKey(addDays(new Date(), -1)));
   const [hours, setHours] = useState(7.5);
   const [quality, setQuality] = useState<SleepQuality>(3);
@@ -69,14 +64,7 @@ export function SleepSection({ rangeDays }: Props) {
   }
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center gap-2 px-1">
-        <Moon size={13} className="text-accent" />
-        <h2 className="text-2xs uppercase tracking-widest text-ink-muted">
-          Sleep
-        </h2>
-      </div>
-
+    <>
       <div className="grid grid-cols-2 gap-3">
         <Card className="p-4">
           <Stat
@@ -108,9 +96,8 @@ export function SleepSection({ rangeDays }: Props) {
         size="lg"
         className="w-full"
         onClick={() => {
-          // Reset draft to "last night" on each open so it's the common case.
+          // "Last night" is the typical log-on-waking case
           setDate(toKey(addDays(new Date(), -1)));
-          // Pre-fill from latest if it exists, otherwise sensible defaults.
           setHours(latest?.hours ?? 7.5);
           setQuality(latest?.quality ?? 3);
           setOpen(true);
@@ -119,33 +106,53 @@ export function SleepSection({ rangeDays }: Props) {
         <Plus size={16} strokeWidth={2.5} /> Log sleep
       </Button>
 
-      {hasData ? (
-        <Card>
-          <CardHeader
-            title="Hours per night"
-            subtitle={`Last ${rangeDays} days · target 8h`}
-          />
-          <CardBody>
-            <SleepBars data={trend} />
-          </CardBody>
-        </Card>
-      ) : (
-        <Empty
-          title="No sleep logged"
-          hint="Log how long you slept and how it felt to see your trend."
+      <Card>
+        <CardHeader
+          title="Hours per night"
+          subtitle={hasData ? `Target 8h` : "No data yet"}
+          trailing={
+            <div className="inline-flex bg-bg-elev border border-line rounded-md p-0.5">
+              {([7, 30, 90] as Range[]).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRange(r)}
+                  className={[
+                    "px-2.5 h-7 rounded text-2xs font-medium tracking-wide transition-colors",
+                    range === r
+                      ? "bg-bg-hover text-ink"
+                      : "text-ink-muted hover:text-ink",
+                  ].join(" ")}
+                >
+                  {r}d
+                </button>
+              ))}
+            </div>
+          }
         />
-      )}
+        <CardBody>
+          {hasData ? (
+            <SleepBars data={trend} />
+          ) : (
+            <div className="h-40 flex items-center justify-center text-xs text-ink-dim">
+              Log a night to see the chart.
+            </div>
+          )}
+        </CardBody>
+      </Card>
 
-      {sleep.length > 0 && (
+      <SectionLabel>Recent</SectionLabel>
+      {sleep.length === 0 ? (
+        <Empty
+          title="No sleep logged yet"
+          hint="Tap Log sleep to record how long and how well you slept."
+        />
+      ) : (
         <Card className="divide-y divide-line overflow-hidden">
           {[...sleep]
             .sort((a, b) => (a.date < b.date ? 1 : -1))
-            .slice(0, 7)
+            .slice(0, 14)
             .map((s) => (
-              <div
-                key={s.id}
-                className="flex items-center gap-3 px-4 py-3"
-              >
+              <div key={s.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-ink">
                     {format(parseISO(s.date), "EEE, MMM d")}
@@ -217,7 +224,7 @@ export function SleepSection({ rangeDays }: Props) {
           </Button>
         </div>
       </Modal>
-    </section>
+    </>
   );
 }
 
@@ -235,9 +242,9 @@ interface BarPoint {
 }
 
 function SleepBars({ data }: { data: BarPoint[] }) {
-  // Trim leading zero-tail so the chart starts from the first logged night.
   const firstNonZero = data.findIndex((p) => p.hours > 0);
-  const trimmed = firstNonZero > 0 ? data.slice(Math.max(0, firstNonZero - 1)) : data;
+  const trimmed =
+    firstNonZero > 0 ? data.slice(Math.max(0, firstNonZero - 1)) : data;
   const max = Math.max(10, ...trimmed.map((p) => p.hours));
 
   return (
