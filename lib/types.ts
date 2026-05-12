@@ -34,6 +34,13 @@ export interface Exercise {
   notes?: string;
 }
 
+export interface CardioEntry {
+  id: ID;
+  type: string;               // e.g. "Running", "Cycling", or user-typed
+  duration: number;           // minutes
+  distance?: number;          // optional — km (when weight unit is kg) or mi (when lb)
+}
+
 export interface Workout {
   id: ID;
   title: string;              // user-provided e.g. "Push Day"
@@ -41,7 +48,9 @@ export interface Workout {
   startedAt: string;          // ISO
   endedAt?: string;           // ISO
   exercises: Exercise[];
-  // Counts as a "gym day" for the weekly tracker once exercises exist.
+  cardio?: CardioEntry[];     // optional — older saved workouts won't have this
+  // Counts as a "gym day" for the weekly tracker when either exercises or
+  // cardio entries are present.
 }
 
 export interface BodyMetric {

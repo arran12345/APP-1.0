@@ -71,6 +71,7 @@ export async function downloadReport(
   const sleep = state.sleep.filter((s) => inWindow(s.date));
   const metrics = state.metrics.filter((m) => inWindow(m.date));
   const unit = state.settings.unit;
+  const distanceUnit = unit === "kg" ? "km" : "mi";
 
   // ----- Page header (top of page 1) -------------------------------------
   doc.setFont("helvetica", "bold");
@@ -111,6 +112,18 @@ export async function downloadReport(
       ? +(lastMetric.bodyFat - firstMetric.bodyFat).toFixed(1)
       : null;
 
+  // Cardio summary across the window
+  let cardioCount = 0;
+  let cardioMinutes = 0;
+  let cardioDistance = 0;
+  for (const w of workouts) {
+    for (const c of w.cardio ?? []) {
+      cardioCount += 1;
+      cardioMinutes += c.duration;
+      if (c.distance != null) cardioDistance += c.distance;
+    }
+  }
+
   const summaryRows: [string, string][] = [
     ["TRAINING", ""],
     ["  Sessions", String(training.sessions)],
@@ -118,6 +131,15 @@ export async function downloadReport(
     [
       `  Total volume (${unit})`,
       Math.round(training.totalVolume).toLocaleString(),
+    ],
+    ["  Cardio sessions", String(cardioCount)],
+    [
+      "  Total cardio time",
+      cardioCount > 0 ? `${cardioMinutes} min` : "—",
+    ],
+    [
+      `  Total cardio distance (${distanceUnit})`,
+      cardioDistance > 0 ? cardioDistance.toFixed(2) : "—",
     ],
     ["", ""],
     ["NUTRITION", ""],
@@ -202,7 +224,17 @@ export async function downloadReport(
     );
 
     autoTable(doc, {
-      head: [["Date", "Title", "Exercises", "Sets done", `Volume (${unit})`]],
+      head: [
+        [
+          "Date",
+          "Title",
+          "Ex",
+          "Sets",
+          `Vol (${unit})`,
+          "Cardio",
+          "Min",
+        ],
+      ],
       body: sortedWorkouts.map((w) => {
         let sets = 0;
         let vol = 0;
@@ -213,12 +245,16 @@ export async function downloadReport(
             vol += s.reps * s.weight;
           }
         }
+        const cCount = w.cardio?.length ?? 0;
+        const cMins = (w.cardio ?? []).reduce((sum, c) => sum + c.duration, 0);
         return [
           w.date,
           w.title,
           String(w.exercises.length),
           String(sets),
           Math.round(vol).toLocaleString(),
+          String(cCount),
+          cCount > 0 ? String(cMins) : "—",
         ];
       }),
       theme: "striped",
@@ -227,7 +263,7 @@ export async function downloadReport(
       margin: MARGIN,
     });
 
-    // Per-workout exercise/set breakdown
+    // Per-workout exercise/set breakdown + cardio
     for (const w of sortedWorkouts) {
       subheading(autoTable, doc, `${w.date} · ${w.title}`);
       for (const e of w.exercises) {
@@ -247,6 +283,27 @@ export async function downloadReport(
             1: { cellWidth: 90 },
             2: { cellWidth: 60 },
             3: { cellWidth: 50 },
+          },
+          margin: MARGIN,
+        });
+      }
+      if (w.cardio && w.cardio.length > 0) {
+        autoTable(doc, {
+          head: [
+            ["Cardio", "Duration (min)", `Distance (${distanceUnit})`],
+          ],
+          body: w.cardio.map((c) => [
+            c.type,
+            String(c.duration),
+            c.distance != null ? String(c.distance) : "—",
+          ]),
+          theme: "grid",
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: SUBHEAD_FILL, textColor: 30 },
+          columnStyles: {
+            0: { cellWidth: "auto" },
+            1: { cellWidth: 90 },
+            2: { cellWidth: 90 },
           },
           margin: MARGIN,
         });

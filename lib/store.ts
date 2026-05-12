@@ -6,6 +6,7 @@ import { uid } from "./utils";
 import { todayKey, toKey, weekDays, fromKey } from "./date";
 import type {
   BodyMetric,
+  CardioEntry,
   DateKey,
   Exercise,
   ExerciseSet,
@@ -58,6 +59,18 @@ interface State {
   ) => void;
   toggleSet: (workoutId: string, exerciseId: string, setId: string) => void;
   removeSet: (workoutId: string, exerciseId: string, setId: string) => void;
+
+  // --- cardio ------------------------------------------------------------
+  addCardio: (
+    workoutId: string,
+    entry: Omit<CardioEntry, "id">,
+  ) => string;
+  updateCardio: (
+    workoutId: string,
+    cardioId: string,
+    patch: Partial<Omit<CardioEntry, "id">>,
+  ) => void;
+  removeCardio: (workoutId: string, cardioId: string) => void;
 
   // --- metrics -----------------------------------------------------------
   logMetric: (m: Omit<BodyMetric, "id">) => void;
@@ -239,6 +252,45 @@ export const useStore = create<State>()(
           ),
         })),
 
+      addCardio: (workoutId, entry) => {
+        const cId = uid();
+        set((s) => ({
+          workouts: s.workouts.map((w) =>
+            w.id !== workoutId
+              ? w
+              : {
+                  ...w,
+                  cardio: [...(w.cardio ?? []), { id: cId, ...entry }],
+                },
+          ),
+        }));
+        return cId;
+      },
+      updateCardio: (workoutId, cardioId, patch) =>
+        set((s) => ({
+          workouts: s.workouts.map((w) =>
+            w.id !== workoutId
+              ? w
+              : {
+                  ...w,
+                  cardio: (w.cardio ?? []).map((c) =>
+                    c.id === cardioId ? { ...c, ...patch } : c,
+                  ),
+                },
+          ),
+        })),
+      removeCardio: (workoutId, cardioId) =>
+        set((s) => ({
+          workouts: s.workouts.map((w) =>
+            w.id !== workoutId
+              ? w
+              : {
+                  ...w,
+                  cardio: (w.cardio ?? []).filter((c) => c.id !== cardioId),
+                },
+          ),
+        })),
+
       logMetric: (m) =>
         set((s) => ({ metrics: [{ id: uid(), ...m }, ...s.metrics] })),
       removeMetric: (id) =>
@@ -272,7 +324,11 @@ export const useStore = create<State>()(
 // ---------------------------------------------------------------------------
 
 export function isGymDay(workouts: Workout[], key: DateKey): boolean {
-  return workouts.some((w) => w.date === key && w.exercises.length > 0);
+  return workouts.some(
+    (w) =>
+      w.date === key &&
+      (w.exercises.length > 0 || (w.cardio?.length ?? 0) > 0),
+  );
 }
 
 export interface WeekStatus {
@@ -306,7 +362,11 @@ export function selectWeekStatus(
  */
 export function selectGymStreak(workouts: Workout[]): number {
   const gymDays = new Set(
-    workouts.filter((w) => w.exercises.length > 0).map((w) => w.date),
+    workouts
+      .filter(
+        (w) => w.exercises.length > 0 || (w.cardio?.length ?? 0) > 0,
+      )
+      .map((w) => w.date),
   );
   if (gymDays.size === 0) return 0;
   // Walk back from today; tolerate a single rest day between gym sessions
@@ -391,7 +451,7 @@ export function selectLatestMetric(metrics: BodyMetric[]): BodyMetric | undefine
 /** Days since last gym session — useful for "consistency" warnings. */
 export function selectDaysSinceLastGym(workouts: Workout[]): number | null {
   const last = workouts
-    .filter((w) => w.exercises.length > 0)
+    .filter((w) => w.exercises.length > 0 || (w.cardio?.length ?? 0) > 0)
     .map((w) => w.date)
     .sort()
     .at(-1);

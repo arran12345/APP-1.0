@@ -47,7 +47,23 @@ export function WorkoutList() {
                 (s, e) => s + e.sets.filter((x) => x.done).length,
                 0,
               );
+              const cardioCount = w.cardio?.length ?? 0;
+              const cardioMinutes = (w.cardio ?? []).reduce(
+                (sum, c) => sum + c.duration,
+                0,
+              );
               const inProgress = !w.endedAt;
+              // Build the summary string conditionally so cardio-only or
+              // strength-only workouts read cleanly.
+              const parts: string[] = [];
+              if (w.exercises.length > 0) {
+                parts.push(`${w.exercises.length} ex · ${doneSets}/${totalSets} sets`);
+              }
+              if (cardioCount > 0) {
+                parts.push(`${cardioCount} cardio · ${cardioMinutes} min`);
+              }
+              const summary =
+                parts.length > 0 ? parts.join(" · ") : "empty workout";
               return (
                 <Link
                   key={w.id}
@@ -64,8 +80,7 @@ export function WorkoutList() {
                       )}
                     </div>
                     <p className="text-xs text-ink-muted mt-0.5 tabular-nums">
-                      {relativeLabel(w.date)} · {w.exercises.length} ex ·{" "}
-                      {doneSets}/{totalSets} sets
+                      {relativeLabel(w.date)} · {summary}
                     </p>
                   </div>
                   <ChevronRight size={16} className="text-ink-dim shrink-0" />

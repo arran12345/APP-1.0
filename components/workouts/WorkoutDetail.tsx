@@ -11,6 +11,7 @@ import { ArrowLeft, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CardioSection } from "./CardioSection";
 import { ExerciseBlock } from "./ExerciseBlock";
 
 const EXERCISE_SUGGESTIONS = [
@@ -168,15 +169,23 @@ export function WorkoutDetail({ id }: { id: string }) {
           </div>
         )}
 
-        {!workout.endedAt && workout.exercises.length > 0 && (
-          <Button
-            variant="primary"
-            className="w-full"
-            onClick={() => endWorkout(workout.id)}
-          >
-            Finish workout
-          </Button>
-        )}
+        <CardioSection
+          workoutId={workout.id}
+          cardio={workout.cardio ?? []}
+          unit={settings.unit}
+        />
+
+        {!workout.endedAt &&
+          (workout.exercises.length > 0 ||
+            (workout.cardio?.length ?? 0) > 0) && (
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={() => endWorkout(workout.id)}
+            >
+              Finish workout
+            </Button>
+          )}
       </main>
 
       {/* Add-exercise modal */}
