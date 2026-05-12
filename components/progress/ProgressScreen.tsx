@@ -14,6 +14,7 @@ import {
 import { todayKey } from "@/lib/date";
 import { HeartPulse, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ExportCard } from "./ExportCard";
 import { MetricChart } from "./MetricChart";
 import { TrainingSection } from "./TrainingSection";
 import { NutritionSection } from "./NutritionSection";
@@ -166,6 +167,9 @@ export function ProgressScreen() {
 
       {/* ----- Nutrition section ----- */}
       <NutritionSection rangeDays={range} />
+
+      {/* ----- PDF export ----- */}
+      <ExportCard />
 
       {/* ----- Body metric history ----- */}
       <section>
